@@ -17,7 +17,7 @@ public:
     Sprite ghostSprite;
     int moveCounter;
     vector<int> path;
-
+	bool isVisible=1;
 public:
     int status;
     Texture ghostTex;

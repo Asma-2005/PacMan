@@ -54,7 +54,10 @@ void handleEvents(RenderWindow& window, Menu& menu, int& pagenum);
 void numphoto_checkMouseHover(RenderWindow& window, RectangleShape numplay[], int& selectedOption);
 void select_checkMouseHover(RenderWindow& window, Sprite difficulty[], int numphoto, int& selectedOption);
 int SelectDifficulty(RenderWindow& window);
+int showGameOverScreen(RenderWindow& window);
 
+
+bool DeathSoundBool = false;
 
 
 RenderWindow window(VideoMode(1920, 1080), "Game", Style::Fullscreen);
@@ -522,8 +525,21 @@ int Game_Play(RenderWindow& window, int level, SoundManager& soundManagerr) {
             if (Keyboard::isKeyPressed(Keyboard::Escape)) return 1000;
         }
 
-        player.movement();
         myghost.movement(player, g);
+        player.movement();
+
+        if (player.isDying &&!DeathSoundBool) {
+			soundManagerr.sound[5].stop();
+            soundManagerr.sound[6].play();
+           // soundManagerr.sound[6].stop();
+            DeathSoundBool = 1;
+        }
+        
+        if (player.isDead) {
+            cout << "Dead";
+            return showGameOverScreen(window);
+        
+        }
 
         for (auto it = foodList.begin(); it != foodList.end(); ) {
             if (player.pacsprite.getGlobalBounds().intersects((*it)->getBounds())) {
@@ -534,6 +550,8 @@ int Game_Play(RenderWindow& window, int level, SoundManager& soundManagerr) {
                     soundManagerr.sound[4].stop();
                     soundManagerr.sound[4].setLoop(true);
                     soundManagerr.sound[4].play();
+					//after 5 sec stop the sound
+					//soundManagerr.sound[4].stop();
                     soundManagerr.sound[5].stop();
                 }
                 score += (*it)->getValueScore();
@@ -567,4 +585,21 @@ int Game_Play(RenderWindow& window, int level, SoundManager& soundManagerr) {
         }
 
     }
+}
+int showGameOverScreen(RenderWindow& window) {
+    Texture gameOverTexture;
+    if (!gameOverTexture.loadFromFile("Assets/images/GameOver4.jpg")) {
+        cout << "ERROR: Can't load game_over.png\n";
+        return 1000;
+    }
+    Sprite gameOverSprite;
+    gameOverSprite.setTexture(gameOverTexture);
+    gameOverSprite.setPosition(0,0);
+
+    Clock timer;
+    while (timer.getElapsedTime().asSeconds() < 3.0f) {
+        window.draw(gameOverSprite);
+		window.display();
+    }
+    return 1000;
 }
