@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Graph.h"
+#include "Score.h"
 
 using namespace sf;
 
@@ -13,6 +14,9 @@ public:
     int i, j;
     Sprite pacsprite;
     int nextStatus;
+
+    Score score;
+
 public:
     int status;
     Texture pactexture;

@@ -29,6 +29,7 @@
 #include "pacman.h"
 #include<dsound.h>
 #include "TileRenderer.h"
+#include "FileHandler.h"
 
 using namespace std;
 using namespace sf;
@@ -60,511 +61,523 @@ int SelectDifficulty(RenderWindow& window);
 RenderWindow window(VideoMode(1920, 1080), "Game", Style::Fullscreen);
 
 int main() {
-    SoundManager soundManagerr;
-    if (!soundManagerr.initialize()) {
-        cout << "ERROR: Can't load sounds\n";
-        system("pause");
-        return -1;
-    }
-    soundManagerr.sound[0].setLoop(true);
-    soundManagerr.sound[0].play();
+	SoundManager soundManagerr;
+	if (!soundManagerr.initialize()) {
+		cout << "ERROR: Can't load sounds\n";
+		system("pause");
+		return -1;
+	}
+	soundManagerr.sound[0].setLoop(true);
+	soundManagerr.sound[0].play();
 
-    int pagenum = 1000; // Index for choosing
-    Menu menu(1920, 1080);
-    Texture mainmenubg;
-    if (!mainmenubg.loadFromFile("Assets/images/menu main.png")) {
-        cout << "ERROR: Can't load menu main.jpg\n";
-        window.close();
-        return -1;
-    }
-    Sprite bg;
-    bg.setPosition(0, -200);
-    bg.setTexture(mainmenubg);
+	int pagenum = 1000; // Index for choosing
+	Menu menu(1920, 1080);
+	Texture mainmenubg;
+	if (!mainmenubg.loadFromFile("Assets/images/menu main.png")) {
+		cout << "ERROR: Can't load menu main.jpg\n";
+		window.close();
+		return -1;
+	}
+	Sprite bg;
+	bg.setPosition(0, -200);
+	bg.setTexture(mainmenubg);
 
 
-    while (true) {
+	//Read scores from the file
+	FileHandler score_file;
+	score_file.jsonRead();
+	stack<Score> s = score_file.jsonRead();
 
-        if (pagenum == 1000) {
-            while (window.isOpen()) {
-                handleEvents(window, menu, pagenum);
-                if (pagenum != 1000) {
-                    break;
-                }
+	
 
-                drawMenu(window, menu, bg);
-            }
-            if (pagenum == 0) {
-                int level = SelectDifficulty(window);
-                soundManagerr.sound[0].stop();
-                soundManagerr.sound[1].play();
-                pagenum = Game_Play(window, level, soundManagerr);
-                soundManagerr.sound[0].play();
-            }
-            if (pagenum == -1) {
-                soundManagerr.sound[0].stop();
-                window.close();
-                break;
-            }
-            if (pagenum == 2) {
-                pagenum = Design(window);
-            }
-            if (pagenum == 1) {
-                pagenum = instruction(window);
-            }
+	while (true) {
 
-            for (int i = 1; i < 9; i++)
-            {
-                soundManagerr.sound[i].stop();
-            }
-        }
-    }
-    return 0;
+		if (pagenum == 1000) {
+			while (window.isOpen()) {
+				handleEvents(window, menu, pagenum);
+				if (pagenum != 1000) {
+					break;
+				}
+
+				drawMenu(window, menu, bg);
+			}
+			if (pagenum == 0) {
+				int level = SelectDifficulty(window);
+				soundManagerr.sound[0].stop();
+				soundManagerr.sound[1].play();
+				pagenum = Game_Play(window, level, soundManagerr);
+				soundManagerr.sound[0].play();
+			}
+			if (pagenum == -1) {
+				soundManagerr.sound[0].stop();
+				window.close();
+				break;
+			}
+			if (pagenum == 2) {
+				pagenum = Design(window);
+			}
+			if (pagenum == 1) {
+				pagenum = instruction(window);
+			}
+
+			for (int i = 1; i < 9; i++)
+			{
+				soundManagerr.sound[i].stop();
+			}
+		}
+	}
+
+
+
+
+	return 0;
 }
 
 void handleEvents(RenderWindow& window, Menu& menu, int& pagenum) {
-    Event event;
-    while (window.pollEvent(event)) {
-        if (event.type == Event::Closed) {
-            window.close();
-            break;
-        }
-        if (event.type == Event::KeyPressed) {
-            if (event.key.code == Keyboard::Up) {
-                menu.MoveUp();
-            }
-            if (event.key.code == Keyboard::Down) {
-                menu.MoveDown();
-            }
-            if (event.key.code == Keyboard::Return) {
-                if (menu.pressed() == 0) {
-                    pagenum = 0;
-                }
-                if (menu.pressed() == 1) {
+	Event event;
+	while (window.pollEvent(event)) {
+		if (event.type == Event::Closed) {
+			window.close();
+			break;
+		}
+		if (event.type == Event::KeyPressed) {
+			if (event.key.code == Keyboard::Up) {
+				menu.MoveUp();
+			}
+			if (event.key.code == Keyboard::Down) {
+				menu.MoveDown();
+			}
+			if (event.key.code == Keyboard::Return) {
+				if (menu.pressed() == 0) {
+					pagenum = 0;
+				}
+				if (menu.pressed() == 1) {
 
-                    pagenum = 1;
-                }
-                if (menu.pressed() == 2) {
+					pagenum = 1;
+				}
+				if (menu.pressed() == 2) {
 
-                    pagenum = 2;
-                }
-                if (menu.pressed() == 3) {
-                    pagenum = -1;
-                }
-            }
-        }
+					pagenum = 2;
+				}
+				if (menu.pressed() == 3) {
+					pagenum = -1;
+				}
+			}
+		}
 
-        if (event.type == Event::MouseMoved) {
-            menu.checkMouseHover(window);
-        }
+		if (event.type == Event::MouseMoved) {
+			menu.checkMouseHover(window);
+		}
 
-        if (event.type == Event::MouseButtonPressed) {
-            if (event.mouseButton.button == Mouse::Left)
-            {
-                int selectedItemIndex = menu.getHoveredIndex(window);
-                if (selectedItemIndex != -1 && selectedItemIndex == menu.pressed()) {
-                    if (menu.pressed() == 0) {
-                        pagenum = 0;
-                    }
-                    if (menu.pressed() == 1) {
+		if (event.type == Event::MouseButtonPressed) {
+			if (event.mouseButton.button == Mouse::Left)
+			{
+				int selectedItemIndex = menu.getHoveredIndex(window);
+				if (selectedItemIndex != -1 && selectedItemIndex == menu.pressed()) {
+					if (menu.pressed() == 0) {
+						pagenum = 0;
+					}
+					if (menu.pressed() == 1) {
 
-                        pagenum = 1;
-                    }
-                    if (menu.pressed() == 2) {
+						pagenum = 1;
+					}
+					if (menu.pressed() == 2) {
 
-                        pagenum = 2;
-                    }
-                    if (menu.pressed() == 3) {
-                        pagenum = -1;
-                    }
-                }
-            }
-        }
-    }
+						pagenum = 2;
+					}
+					if (menu.pressed() == 3) {
+						pagenum = -1;
+					}
+				}
+			}
+		}
+	}
 }
 
 void drawMenu(RenderWindow& window, Menu& menu, Sprite& bg)
 {
-    window.clear();
-    window.draw(bg);
-    menu.draw(window);
-    window.display();
+	window.clear();
+	window.draw(bg);
+	menu.draw(window);
+	window.display();
 }
 
 void numphoto_checkMouseHover(RenderWindow& window, RectangleShape numplay[], int& selectedOption)
 {
-    bool check = 0;
-    for (int i = 0; i < 6; i++)
-    {
-        if (numplay[i].getGlobalBounds().contains(window.mapPixelToCoords(Mouse::getPosition(window))))
-        {
-            selectedOption = i;
-            check = 1;
-        }
-    }
-    if (check == 0)
-    {
-        selectedOption = -1;
-    }
+	bool check = 0;
+	for (int i = 0; i < 6; i++)
+	{
+		if (numplay[i].getGlobalBounds().contains(window.mapPixelToCoords(Mouse::getPosition(window))))
+		{
+			selectedOption = i;
+			check = 1;
+		}
+	}
+	if (check == 0)
+	{
+		selectedOption = -1;
+	}
 
 }
 
 int Design(RenderWindow& window)
 {
-    Texture background;
-    background.loadFromFile("Assets/images/Designers.jpg");  //background
-    Sprite bg;
-    bg.setTexture(background);
-    Font font;
-    font.loadFromFile("Assets/font/Prison Tattoo.ttf");   //font
-    Text t[8];
-    for (int i = 0; i < 8; i++)
-    {
-        t[i].setFont(font);                           //language
-        t[i].setCharacterSize(70);             //font size 
-        t[i].setFillColor(Color::White);
-        t[i].setPosition(520, (920));      //( X , Y)
-    }
-    t[0].setString("Taha Mustafa Abdel Fattah");
-    t[1].setString("\t  Reham Maher Roshdy");
-    t[2].setString("  Yousab Ashraf Makram");
-    t[3].setString("Mohamed Sameh El-Sayed");
-    t[4].setString("Asmaa Walid Sayed Moawad");
-    t[5].setString("\tYoussef Khaled Hussein");
-    t[6].setString("\tRana Mohamad Fattouh ");
-    t[7].setString("It was developed by them");
+	Texture background;
+	background.loadFromFile("Assets/images/Designers.jpg");
+	Sprite bg;
+	bg.setTexture(background);
+	Font font;
+	font.loadFromFile("Assets/font/Prison Tattoo.ttf");
+	Text t[8];
+	for (int i = 0; i < 8; i++)
+	{
+		t[i].setFont(font);
+		t[i].setCharacterSize(70);
+		t[i].setFillColor(Color::White);
+		t[i].setPosition(520, (920));
+	}
+	t[0].setString("Taha Mustafa Abdel Fattah");
+	t[1].setString("\t  Reham Maher Roshdy");
+	t[2].setString("  Yousab Ashraf Makram");
+	t[3].setString("Mohamed Sameh El-Sayed");
+	t[4].setString("Asmaa Walid Sayed Moawad");
+	t[5].setString("\tYoussef Khaled Hussein");
+	t[6].setString("\tRana Mohamad Fattouh ");
+	t[7].setString("It was developed by them");
 
 
-    RectangleShape Photo[6];
+	RectangleShape Photo[6];
 
-    Photo[0].setPosition(70, 210.f);
-    Photo[1].setPosition(380.f, 210.f);
-    Photo[2].setPosition(690.f, 210.f);
-    Photo[3].setPosition(1000.f, 210.f);
-    Photo[4].setPosition(1310, 210.f);
-    Photo[5].setPosition(1630.f, 210.f);
-    for (int i = 0; i < 6; i++)
-    {
-        Photo[i].setSize(Vector2f(230, 660));
-        Photo[i].setFillColor(Color::Green);
-    }
-
-
-    int numphoto = -1;
-    int selectedOption = -1;
-    int checkphoto = -1;
-    while (window.isOpen())
-    {
-        Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == Event::Closed())
-            {
-                window.close();
-            }
-            if (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape)
-            {
-                return 1000;
-            }
-        }
-        if (event.type == Event::MouseMoved)
-        {
-            numphoto_checkMouseHover(window, Photo, selectedOption);
-        }
-        if (event.type == Event::MouseMoved)
-        {
-            for (int i = 0; i < 6; i++)
-            {
-                if (Photo[i].getGlobalBounds().contains(window.mapPixelToCoords(Mouse::getPosition(window))))
-                {
-                    checkphoto = i;
-                    break;
-                }
-            }
-        }
-        if (checkphoto == selectedOption)
-        {
-            numphoto = checkphoto;
-        }
-        else
-        {
-            numphoto = -1;
-        }
+	Photo[0].setPosition(70, 210.f);
+	Photo[1].setPosition(380.f, 210.f);
+	Photo[2].setPosition(690.f, 210.f);
+	Photo[3].setPosition(1000.f, 210.f);
+	Photo[4].setPosition(1310, 210.f);
+	Photo[5].setPosition(1630.f, 210.f);
+	for (int i = 0; i < 6; i++)
+	{
+		Photo[i].setSize(Vector2f(230, 660));
+		Photo[i].setFillColor(Color::Green);
+	}
 
 
-        window.clear();
-        window.draw(bg);   //background
-        if (numphoto == -1)
-        {
-            window.draw(t[7]);
-        }
-        else
-        {
-            window.draw(t[numphoto]);
-        }
+	int numphoto = -1;
+	int selectedOption = -1;
+	int checkphoto = -1;
+	while (window.isOpen())
+	{
+		Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == Event::Closed())
+			{
+				window.close();
+			}
+			if (event.type == Event::KeyPressed && event.key.code == Keyboard::Escape)
+			{
+				return 1000;
+			}
+		}
+		if (event.type == Event::MouseMoved)
+		{
+			numphoto_checkMouseHover(window, Photo, selectedOption);
+		}
+		if (event.type == Event::MouseMoved)
+		{
+			for (int i = 0; i < 6; i++)
+			{
+				if (Photo[i].getGlobalBounds().contains(window.mapPixelToCoords(Mouse::getPosition(window))))
+				{
+					checkphoto = i;
+					break;
+				}
+			}
+		}
+		if (checkphoto == selectedOption)
+		{
+			numphoto = checkphoto;
+		}
+		else
+		{
+			numphoto = -1;
+		}
 
-        window.display();
-    }
+
+		window.clear();
+		window.draw(bg);
+		if (numphoto == -1)
+		{
+			window.draw(t[7]);
+		}
+		else
+		{
+			window.draw(t[numphoto]);
+		}
+
+		window.display();
+	}
 }
 
 int instruction(RenderWindow& window)
 {
-    Texture background;
-    Sprite bg;
-    background.loadFromFile("Assets/images/instructions.jpg");  //background
+	Texture background;
+	Sprite bg;
+	background.loadFromFile("Assets/images/instructions.jpg");
 
-    Sprite KEY;
-    Texture key;
-    key.loadFromFile("Assets/images/key.png");
-
-
-    KEY.setPosition(1200, 650);
-    KEY.setScale(0.6, 0.6);
-
-    KEY.setTexture(key);
-    bg.setTexture(background);
-
-    Sprite Gameimage;
-    Texture gameimage;
-    gameimage.loadFromFile("Assets/images/Gameimage.png");
-    Gameimage.setPosition(900, 100);
-    Gameimage.setScale(1.7, 1.7);
-    Gameimage.setTexture(gameimage);
+	Sprite KEY;
+	Texture key;
+	key.loadFromFile("Assets/images/key.png");
 
 
+	KEY.setPosition(1200, 650);
+	KEY.setScale(0.6, 0.6);
 
-    Font font;
-    font.loadFromFile("Assets/font/Prison Tattoo.ttf");   //font
-    Text t[5];
-    for (int i = 0; i < 5; i++)
-    {
-        t[i].setFont(font);
-        t[i].setCharacterSize(150);
-        t[i].setFillColor(Color::White);
-    }
-    t[0].setPosition(200, 200);
-    t[1].setPosition(250, 400);
-    t[2].setPosition(200, 600);
-    t[3].setPosition(1110, 900);
-    t[4].setPosition(900, 400);
+	KEY.setTexture(key);
+	bg.setTexture(background);
 
-
-    t[3].setCharacterSize(60);
-    t[4].setCharacterSize(45);
+	Sprite Gameimage;
+	Texture gameimage;
+	gameimage.loadFromFile("Assets/images/Gameimage.png");
+	Gameimage.setPosition(900, 100);
+	Gameimage.setScale(1.7, 1.7);
+	Gameimage.setTexture(gameimage);
 
 
 
-    t[0].setString("HOW");
-    t[1].setString("TO");
-    t[2].setString("PLAY");
-    t[3].setString("Control Buttons");
-    t[4].setString("Move Pac-Man using the arrow keys and \n"
-        "eat all the dots in the maze. Avoid the \n"
-        "ghosts,but if you eat a big dot, the \n"
-        "ghosts turn blue and you can eat them. \n"
-        "Clear all the dots to go tothe next level.");
+	Font font;
+	font.loadFromFile("Assets/font/Prison Tattoo.ttf");
+	Text t[5];
+	for (int i = 0; i < 5; i++)
+	{
+		t[i].setFont(font);
+		t[i].setCharacterSize(150);
+		t[i].setFillColor(Color::White);
+	}
+	t[0].setPosition(200, 200);
+	t[1].setPosition(250, 400);
+	t[2].setPosition(200, 600);
+	t[3].setPosition(1110, 900);
+	t[4].setPosition(900, 400);
+
+
+	t[3].setCharacterSize(60);
+	t[4].setCharacterSize(45);
+
+
+
+	t[0].setString("HOW");
+	t[1].setString("TO");
+	t[2].setString("PLAY");
+	t[3].setString("Control Buttons");
+	t[4].setString("Move Pac-Man using the arrow keys and \n"
+		"eat all the dots in the maze. Avoid the \n"
+		"ghosts,but if you eat a big dot, the \n"
+		"ghosts turn blue and you can eat them. \n"
+		"Clear all the dots to go tothe next level.");
 
 
 
 
-    while (window.isOpen())
-    {
-        Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == Event::Closed())
-            {
-                window.close();
-            }
-            if (Keyboard::isKeyPressed(Keyboard::Escape))
-            {
-                return 1000;   //Return to menu
-            }
+	while (window.isOpen())
+	{
+		Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == Event::Closed())
+			{
+				window.close();
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Escape))
+			{
+				return 1000;   //Return to menu
+			}
 
 
-        }
+		}
 
-        window.clear();
-        window.draw(bg);
-        window.draw(KEY);
-        window.draw(Gameimage);
+		window.clear();
+		window.draw(bg);
+		window.draw(KEY);
+		window.draw(Gameimage);
 
-        for (int i = 0; i < 5; i++)
-        {
-            window.draw(t[i]);
-        }
-        window.display();
-    }
+		for (int i = 0; i < 5; i++)
+		{
+			window.draw(t[i]);
+		}
+		window.display();
+	}
 }
 
 void select_checkMouseHover(RenderWindow& window, Sprite difficulty[], int numphoto, int& selectedOption) {
-    bool check = 0;
-    for (int i = 0; i < 3; i++)
-    {
-        if (difficulty[i].getGlobalBounds().contains(window.mapPixelToCoords(Mouse::getPosition(window))))
-        {
-            selectedOption = i;
-            check = 1;
-        }
-    }
-    if (check == 0)
-    {
-        selectedOption = -1;
-    }
+	bool check = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		if (difficulty[i].getGlobalBounds().contains(window.mapPixelToCoords(Mouse::getPosition(window))))
+		{
+			selectedOption = i;
+			check = 1;
+		}
+	}
+	if (check == 0)
+	{
+		selectedOption = -1;
+	}
 }
 int SelectDifficulty(RenderWindow& window) {
-    int selectedOption = -1;
-    Texture background;
-    Sprite bg;
-    background.loadFromFile("Assets/images/select difficulty.png");
-    bg.setTexture(background);
-    bg.setScale(1.9, 1);
-    bg.setPosition(0, 0);
+	int selectedOption = -1;
+	Texture background;
+	Sprite bg;
+	background.loadFromFile("Assets/images/select difficulty.png");
+	bg.setTexture(background);
+	bg.setScale(1.9, 1);
+	bg.setPosition(0, 0);
 
-    Texture difficulty[3];
-    Sprite df[3];
-    difficulty[0].loadFromFile("Assets/images/select easy.png");
-    difficulty[1].loadFromFile("Assets/images/select medium.png");
-    difficulty[2].loadFromFile("Assets/images/select hard.png");
+	Texture difficulty[3];
+	Sprite df[3];
+	difficulty[0].loadFromFile("Assets/images/select easy.png");
+	difficulty[1].loadFromFile("Assets/images/select medium.png");
+	difficulty[2].loadFromFile("Assets/images/select hard.png");
 
-    for (int i = 0; i < 3; i++)
-    {
-        df[i].setTexture(difficulty[i]);
-    }
+	for (int i = 0; i < 3; i++)
+	{
+		df[i].setTexture(difficulty[i]);
+	}
 
-    while (window.isOpen())
-    {
-        Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == Event::Closed)
-            {
-                window.close();
-            }
+	while (window.isOpen())
+	{
+		Event event;
+		while (window.pollEvent(event))
+		{
+			if (event.type == Event::Closed)
+			{
+				window.close();
+			}
 
-            if (Keyboard::isKeyPressed(Keyboard::Escape))
-            {
-                return 1000;
-            }
+			if (Keyboard::isKeyPressed(Keyboard::Escape))
+			{
+				return 1000;
+			}
 
-            if (event.type == Event::MouseMoved)
-            {
-                select_checkMouseHover(window, df, 3, selectedOption);
-            }
+			if (event.type == Event::MouseMoved)
+			{
+				select_checkMouseHover(window, df, 3, selectedOption);
+			}
 
-            if (event.type == Event::MouseButtonPressed) {
-                if (event.mouseButton.button == Mouse::Left)
-                {
-                    if (selectedOption != -1)
-                    {
-                        return selectedOption;
+			if (event.type == Event::MouseButtonPressed) {
+				if (event.mouseButton.button == Mouse::Left)
+				{
+					if (selectedOption != -1)
+					{
+						return selectedOption;
 
-                    }
-                }
-            }
-        }
+					}
+				}
+			}
+		}
 
-        window.clear();
-        window.draw(bg);
+		window.clear();
+		window.draw(bg);
 
-        for (int i = 0; i < 3; i++)
-        {
-            if (selectedOption == i)
-            {
-                df[i].setScale(1.2f, 1.2f);
-                df[i].setPosition(400 * i + 400 - 20, 550 - 20);
-                df[i].setColor(i == 0 ? Color::Green : (i == 1 ? Color::Yellow : Color::Red));
-            }
-            else
-            {
-                df[i].setScale(1.f, 1.f);
-                df[i].setColor(Color::White);
-                df[i].setPosition(400 * i + 400, 550);
-            }
+		for (int i = 0; i < 3; i++)
+		{
+			if (selectedOption == i)
+			{
+				df[i].setScale(1.2f, 1.2f);
+				df[i].setPosition(400 * i + 400 - 20, 550 - 20);
+				df[i].setColor(i == 0 ? Color::Green : (i == 1 ? Color::Yellow : Color::Red));
+			}
+			else
+			{
+				df[i].setScale(1.f, 1.f);
+				df[i].setColor(Color::White);
+				df[i].setPosition(400 * i + 400, 550);
+			}
 
-            window.draw(df[i]);
-        }
+			window.draw(df[i]);
+		}
 
-        window.display();
-    }
+		window.display();
+	}
 }
 
 
 int Game_Play(RenderWindow& window, int level, SoundManager& soundManagerr) {
-    window.setFramerateLimit(60);
-    bool checkstart = 1;
-    Graph g;
-    pacman player(19, 20);
-    TileRenderer tileRenderer(48, level);
-    ghost myghost;
+	window.setFramerateLimit(60);
+	bool checkstart = 1;
+	Graph g;
+	pacman player(19, 20);
+	TileRenderer tileRenderer(48, level);
+	ghost myghost;
 
-    tileRenderer.initializeFood();
+	tileRenderer.initializeFood();
 
-    // Score setup
-    int score = 0;
-    Font font;
-    font.loadFromFile("Assets/font/Prison Tattoo.ttf");
-
-
-
-    Text scoreText;
-    scoreText.setFont(font);
-    scoreText.setCharacterSize(55);
-    scoreText.setFillColor(Color::White);
-
-    auto& foodList = tileRenderer.getfoodList();
+	// Score setup
+	player.score.value = 0;
+	player.score.userName = "test";
+	Font font;
+	font.loadFromFile("Assets/font/Prison Tattoo.ttf");
 
 
-    // Game loop
-    while (window.isOpen()) {
-        Event event;
-        while (window.pollEvent(event)) {
-            if (event.type == Event::Closed) window.close();
-            if (Keyboard::isKeyPressed(Keyboard::Escape)) return 1000;
-        }
 
-        player.movement();
-        myghost.movement(player, g);
+	Text scoreText;
+	scoreText.setFont(font);
+	scoreText.setCharacterSize(55);
+	scoreText.setFillColor(Color::White);
 
-        for (auto it = foodList.begin(); it != foodList.end(); ) {
-            if (player.pacsprite.getGlobalBounds().intersects((*it)->getBounds())) {
-                if ((*it)->getValueScore() == 1) { soundManagerr.sound[2].stop();soundManagerr.sound[2].play(); }
-                if ((*it)->getValueScore() == 20) { soundManagerr.sound[3].stop(); soundManagerr.sound[3].play(); }
-                if ((*it)->getValueScore() == 10)
-                {
-                    soundManagerr.sound[4].stop();
-                    soundManagerr.sound[4].setLoop(true);
-                    soundManagerr.sound[4].play();
-                    soundManagerr.sound[5].stop();
-                }
-                score += (*it)->getValueScore();
-                it = foodList.erase(it);
-            }
-            else {
-                ++it;
-            }
-        }
+	auto& foodList = tileRenderer.getfoodList();
 
-        // Update score text
-        scoreText.setString(std::to_string(score));
-        if (score < 10) scoreText.setPosition(910, 45);
-        else if (score < 100) scoreText.setPosition(890, 45);
-        else scoreText.setPosition(880, 45);
 
-        // Render
-        window.clear();
-        tileRenderer.draw(window);
-        player.draw(window);
-        myghost.draw(window);
-        window.draw(scoreText);
-        window.display();
-        if (checkstart) {
+	// Game loop
+	while (window.isOpen()) {
+		Event event;
+		while (window.pollEvent(event)) {
+			if (event.type == Event::Closed) window.close();
+			if (Keyboard::isKeyPressed(Keyboard::Escape)) return 1000;
+		}
 
-            Sleep(4300);
-            soundManagerr.sound[5].setLoop(true);
-            soundManagerr.sound[5].play();
-            checkstart = 0;
+		player.movement();
+		myghost.movement(player, g);
 
-        }
+		for (auto it = foodList.begin(); it != foodList.end(); ) {
+			if (player.pacsprite.getGlobalBounds().intersects((*it)->getBounds())) {
+				if ((*it)->getValueScore() == 1) { soundManagerr.sound[2].stop();soundManagerr.sound[2].play(); }
+				if ((*it)->getValueScore() == 20) { soundManagerr.sound[3].stop(); soundManagerr.sound[3].play(); }
+				if ((*it)->getValueScore() == 10)
+				{
+					soundManagerr.sound[4].stop();
+					soundManagerr.sound[4].setLoop(true);
+					soundManagerr.sound[4].play();
+					soundManagerr.sound[5].stop();
+				}
+				player.score.value += (*it)->getValueScore();
+				it = foodList.erase(it);
+			}
+			else {
+				++it;
+			}
+		}
 
-    }
+		// Update score text
+		scoreText.setString(std::to_string(player.score.value));
+		if (player.score.value < 10) scoreText.setPosition(910, 45);
+		else if (player.score.value < 100) scoreText.setPosition(890, 45);
+		else scoreText.setPosition(880, 45);
+
+		// Render
+		window.clear();
+		tileRenderer.draw(window);
+		player.draw(window);
+		myghost.draw(window);
+		window.draw(scoreText);
+		window.display();
+		if (checkstart) {
+
+			Sleep(4300);
+			soundManagerr.sound[5].setLoop(true);
+			soundManagerr.sound[5].play();
+			checkstart = 0;
+
+		}
+
+	}
 }
