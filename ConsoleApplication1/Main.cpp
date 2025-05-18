@@ -59,6 +59,9 @@ int SelectDifficulty(RenderWindow& window,string &name);
 
 
 RenderWindow window(VideoMode(1920, 1080), "Game", Style::Fullscreen);
+//Public score variable for reading and writing
+stack<Score> s;
+FileHandler score_file;
 
 int main() {
 
@@ -87,9 +90,9 @@ int main() {
   
     
 	//Read scores from the file
-	FileHandler score_file;
+	
 	score_file.jsonRead();
-	stack<Score> s = score_file.jsonRead();
+	s = score_file.jsonRead();
   
   
 
@@ -569,7 +572,8 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
     tileRenderer.initializeFood();
 
     // Score setup
-    int score = 0;
+    player.score.value = 0;
+    player.score.userName = name;
     Font font;
     font.loadFromFile("Assets/font/Prison Tattoo.ttf");
 
@@ -617,7 +621,7 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
                     soundManagerr.sound[4].play();
                     soundManagerr.sound[5].stop();
                 }
-                score += (*it)->getValueScore();
+                player.score.value += (*it)->getValueScore();
                 it = foodList.erase(it);
             }
             else {
@@ -626,9 +630,9 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
         }
 
         // Update score text
-        scoreText.setString(std::to_string(score));
-        if (score < 10) scoreText.setPosition(950, 45);
-        else if (score < 100) scoreText.setPosition(930, 45);
+        scoreText.setString(std::to_string(player.score.value));
+        if (player.score.value < 10) scoreText.setPosition(950, 45);
+        else if (player.score.value < 100) scoreText.setPosition(930, 45);
         else scoreText.setPosition(910, 45);
 
         // Render
@@ -648,5 +652,12 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
 
         }
 
+
+        //Replace this with the winning condition or losing condition for the player. 
+        if (event.key.code == Keyboard::Enter)
+        {
+            s.push(player.score);
+            score_file.jsonWrite(s);
+        }
     }
 }
