@@ -18,11 +18,14 @@ public:
 	}
 	void checkMouseHover(RenderWindow& window);
 	int getHoveredIndex(RenderWindow& window);
+	Sprite drowscore;
+	Texture DrowScore;
 
 	~Menu();
 
 private:
 	int selected; //selected = Standing on option in array
+	int selected1;
 	Font font;
 
 };

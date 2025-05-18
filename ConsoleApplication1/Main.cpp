@@ -44,6 +44,7 @@ using namespace sf;
 *         0               *         Game_Play                *
 *         1               *         instruction              *
 *         2               *         Designers                *
+*         3               *         Score                    *
 **************************************************************
 */
 
@@ -55,16 +56,15 @@ void handleEvents(RenderWindow& window, Menu& menu, int& pagenum);
 void numphoto_checkMouseHover(RenderWindow& window, RectangleShape numplay[], int& selectedOption);
 void select_checkMouseHover(RenderWindow& window, Sprite difficulty[], int numphoto, int& selectedOption);
 int SelectDifficulty(RenderWindow& window,string &name);
+int score_player(RenderWindow& window);
 
 
 
-RenderWindow window(VideoMode(1920, 1080), "Game", Style::Fullscreen);
-//Public score variable for reading and writing
 stack<Score> s;
 FileHandler score_file;
 
 int main() {
-
+    RenderWindow window(VideoMode(1920, 1080), "Game", Style::Fullscreen);
     SoundManager soundManagerr;
     if (!soundManagerr.initialize()) {
         cout << "ERROR: Can't load sounds\n";
@@ -125,6 +125,10 @@ int main() {
             if (pagenum == 1) {
                 pagenum = instruction(window);
             }
+            if (pagenum == 3) {
+                pagenum = score_player(window);
+            }
+
 
             for (int i = 1; i < 9; i++)
             {
@@ -164,6 +168,7 @@ void handleEvents(RenderWindow& window, Menu& menu, int& pagenum) {
 				if (menu.pressed() == 3) {
 					pagenum = -1;
 				}
+                
 			}
 		}
 
@@ -190,6 +195,9 @@ void handleEvents(RenderWindow& window, Menu& menu, int& pagenum) {
 					if (menu.pressed() == 3) {
 						pagenum = -1;
 					}
+                    if (menu.pressed() == 4) {
+                        pagenum = 3;
+                    }
 				}
 			}
 		}
@@ -601,7 +609,9 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
         Event event;
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed) window.close();
-            if (Keyboard::isKeyPressed(Keyboard::Escape)) return 1000;
+            if (Keyboard::isKeyPressed(Keyboard::Escape))
+
+                return 1000;
         }
 
         player.movement();
@@ -659,5 +669,90 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
             s.push(player.score);
             score_file.jsonWrite(s);
         }
+    }
+}
+
+int score_player(RenderWindow& window) {
+    stack<Score> score = s;
+    Texture background ;
+    background.loadFromFile("Assets/images/bg_score.jpg");
+    Sprite bg;
+    bg.setTexture(background);
+    bg.setPosition(870, 0);
+    bg.setScale(1.3, 1.12);
+    Font font;
+    font.loadFromFile("Assets/font/Prison Tattoo.ttf");
+    Text t[10];
+    int i = 0;
+    while (!score.empty()&&i<10) {
+        t[i].setFont(font);
+        t[i].setCharacterSize(40);
+        t[i].setFillColor(Color::White);
+        t[i].setPosition(50, 100+i*60);
+        t[i].setString("Player name: " + score.top().userName + " with a score of " + to_string(score.top().value) );
+        score.pop();
+        i++;
+    }
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed())
+            {
+                window.close();
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Escape))
+            {
+                return 1000;   
+            }
+        }
+        window.clear();
+        window.draw(bg);
+        for (int j = 0; j < i ; j++)
+        {
+            window.draw(t[j]);
+        }
+        window.display();
+    }
+}
+
+int drowendgame(RenderWindow& window , int score ,string name ,bool winner ) {
+    Texture background;
+    Sprite bg;
+    background.loadFromFile("Assets/images/instructions.jpg");
+
+    Font font;
+    font.loadFromFile("Assets/font/Prison Tattoo.ttf");
+    Text t , txt_winner;
+    txt_winner.setFont(font);
+    txt_winner.setCharacterSize(150);
+    txt_winner.setFillColor(Color::White);
+    txt_winner.setPosition(50, 200);
+    if (winner)
+    {
+        txt_winner.setString("Winner");
+        t.setString("The winner's name is " + name + " with a score of " + to_string(score));
+    }
+    else { 
+        txt_winner.setString("Loser"); 
+        t.setString("The Loser's name is " + name + " with a score of " + to_string(score));
+    }
+
+    t.setFont(font);
+    t.setCharacterSize(70);
+    t.setFillColor(Color::White);
+    t.setPosition(50, 600);
+    while (window.isOpen()) {
+        Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == Event::Closed) window.close();
+            if (Keyboard::isKeyPressed(Keyboard::Escape)) return 1000;
+        }
+        window.clear();
+        window.draw(bg);
+        window.draw(t);
+        window.draw(txt_winner);
+        window.display();
     }
 }
