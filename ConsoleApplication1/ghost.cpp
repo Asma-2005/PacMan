@@ -1,8 +1,11 @@
 #include "ghost.h"
 #include <SFML/Window/Keyboard.hpp>
 #include <cmath>
-
+bool ghost::isVulnerable() {
+    return vulnerable;
+}
 ghost::ghost() {
+    ghostWeakShape.loadFromFile("Assets/Textures/GhostBody32.png");
     ghostTex.loadFromFile("Assets/images/enemy_spritethis.png");
     ghostSprite.setTexture(ghostTex);
     ghostSprite.setTextureRect(IntRect(0, 0, 30, 30));
@@ -12,8 +15,14 @@ ghost::ghost() {
     speed = 1.0f;  
     status = -1;
     moveCounter = 0;
+    vulnerable = false;
 }
-
+void ghost::setVulnerable() {
+    vulnerable = true;
+    vulnerableClock.restart();    
+    ghostSprite.setTexture(ghostWeakShape);
+    ghostSprite.setTextureRect(IntRect(0, 0, 32, 32));
+}
 void ghost::movement(pacman& player, Graph& g) {
     // get char current pos
     Vector2f ghostPos = ghostSprite.getPosition();
@@ -27,10 +36,35 @@ void ghost::movement(pacman& player, Graph& g) {
 
     int ghostNodeId = ghostI * Graph::COLS + ghostJ;
     int pacmanNodeId = pacmanI * Graph::COLS + pacmanJ;
-
+    if (vulnerable && vulnerableClock.getElapsedTime().asSeconds() > vulnerableDuration) {
+        vulnerable = false;
+        ghostSprite.setTexture(ghostTex); 
+    }
     moveCounter++;
     if (moveCounter >= 20) {  // calc new path every 20 frames(3shan el ghost maydokhsh)
-        path = g.bfs(ghostNodeId, pacmanNodeId);
+        int targetNodelId; 
+        if (vulnerable) {
+            float maxDist = -1;
+            int farthestNode = ghostNodeId;
+            for (int i = 0; i < Graph::ROWS; i++) {
+                for (int j = 0; j < Graph::COLS; j++) {
+                    if (g.pacmanMatrix[i][j] != 0) {
+                        float distX = static_cast<float> (j * Graph::NODESIZE) - pacmanPos.x;
+                        float distY = static_cast<float> (i * Graph::NODESIZE) - pacmanPos.y;
+                        float dist = distX * distX + distY * distY;
+                        if (dist > maxDist) {
+                            maxDist = dist;
+                            farthestNode = i * Graph::COLS + j;
+                        }
+                    }
+                }
+            }
+            targetNodelId = farthestNode;
+        }
+        else {
+            targetNodelId = pacmanNodeId;
+        }
+        path = g.bfs(ghostNodeId, targetNodelId);
         moveCounter = 0;
     }
 
@@ -91,6 +125,7 @@ void ghost::movement(pacman& player, Graph& g) {
         else {
             status = -1;
         }
+
     }
 }
 

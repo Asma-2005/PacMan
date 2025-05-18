@@ -49,88 +49,87 @@ using namespace sf;
 
 int Design(RenderWindow& window);
 int instruction(RenderWindow& window);
-int Game_Play(RenderWindow& window, int level, SoundManager& soundManagerr);
+int Game_Play(RenderWindow& window, int level,string &name, SoundManager& soundManagerr);
 void drawMenu(RenderWindow& window, Menu& menu, Sprite& bg);
 void handleEvents(RenderWindow& window, Menu& menu, int& pagenum);
 void numphoto_checkMouseHover(RenderWindow& window, RectangleShape numplay[], int& selectedOption);
 void select_checkMouseHover(RenderWindow& window, Sprite difficulty[], int numphoto, int& selectedOption);
-int SelectDifficulty(RenderWindow& window);
+int SelectDifficulty(RenderWindow& window,string &name);
 
 
 
 RenderWindow window(VideoMode(1920, 1080), "Game", Style::Fullscreen);
 
 int main() {
-	SoundManager soundManagerr;
-	if (!soundManagerr.initialize()) {
-		cout << "ERROR: Can't load sounds\n";
-		system("pause");
-		return -1;
-	}
-	soundManagerr.sound[0].setLoop(true);
-	soundManagerr.sound[0].play();
 
-	int pagenum = 1000; // Index for choosing
-	Menu menu(1920, 1080);
-	Texture mainmenubg;
-	if (!mainmenubg.loadFromFile("Assets/images/menu main.png")) {
-		cout << "ERROR: Can't load menu main.jpg\n";
-		window.close();
-		return -1;
-	}
-	Sprite bg;
-	bg.setPosition(0, -200);
-	bg.setTexture(mainmenubg);
+    SoundManager soundManagerr;
+    if (!soundManagerr.initialize()) {
+        cout << "ERROR: Can't load sounds\n";
+        system("pause");
+        return -1;
+    }
+    soundManagerr.sound[0].setLoop(true);
+    soundManagerr.sound[0].play();
 
+    int pagenum = 1000; // Index for choosing
+    Menu menu(1920, 1080);
+    Texture mainmenubg;
+    if (!mainmenubg.loadFromFile("Assets/images/menu main.png")) {
+        cout << "ERROR: Can't load menu main.jpg\n";
+        window.close();
+        return -1;
+    }
+    Sprite bg;
+    bg.setPosition(0, -200);
+    bg.setTexture(mainmenubg);
 
+    string name;
+  
+    
 	//Read scores from the file
 	FileHandler score_file;
 	score_file.jsonRead();
 	stack<Score> s = score_file.jsonRead();
+  
+  
 
-	
+    while (true) {
 
-	while (true) {
+        if (pagenum == 1000) {
+            while (window.isOpen()) {
+                handleEvents(window, menu, pagenum);
+                if (pagenum != 1000) {
+                    break;
+                }
 
-		if (pagenum == 1000) {
-			while (window.isOpen()) {
-				handleEvents(window, menu, pagenum);
-				if (pagenum != 1000) {
-					break;
-				}
+                drawMenu(window, menu, bg);
+            }
+            if (pagenum == 0) {
+                int level = SelectDifficulty(window,name);
+                soundManagerr.sound[0].stop();
+                soundManagerr.sound[1].play();
+                pagenum = Game_Play(window, level, name, soundManagerr);
+                soundManagerr.sound[0].play();
+            }
+            if (pagenum == -1) {
+                soundManagerr.sound[0].stop();
+                window.close();
+                break;
+            }
+            if (pagenum == 2) {
+                pagenum = Design(window);
+            }
+            if (pagenum == 1) {
+                pagenum = instruction(window);
+            }
 
-				drawMenu(window, menu, bg);
-			}
-			if (pagenum == 0) {
-				int level = SelectDifficulty(window);
-				soundManagerr.sound[0].stop();
-				soundManagerr.sound[1].play();
-				pagenum = Game_Play(window, level, soundManagerr);
-				soundManagerr.sound[0].play();
-			}
-			if (pagenum == -1) {
-				soundManagerr.sound[0].stop();
-				window.close();
-				break;
-			}
-			if (pagenum == 2) {
-				pagenum = Design(window);
-			}
-			if (pagenum == 1) {
-				pagenum = instruction(window);
-			}
-
-			for (int i = 1; i < 9; i++)
-			{
-				soundManagerr.sound[i].stop();
-			}
-		}
-	}
-
-
-
-
-	return 0;
+            for (int i = 1; i < 9; i++)
+            {
+                soundManagerr.sound[i].stop();
+            }
+        }
+    }
+    return 0;
 }
 
 void handleEvents(RenderWindow& window, Menu& menu, int& pagenum) {
@@ -423,161 +422,231 @@ void select_checkMouseHover(RenderWindow& window, Sprite difficulty[], int numph
 		selectedOption = -1;
 	}
 }
-int SelectDifficulty(RenderWindow& window) {
-	int selectedOption = -1;
-	Texture background;
-	Sprite bg;
-	background.loadFromFile("Assets/images/select difficulty.png");
-	bg.setTexture(background);
-	bg.setScale(1.9, 1);
-	bg.setPosition(0, 0);
 
-	Texture difficulty[3];
-	Sprite df[3];
-	difficulty[0].loadFromFile("Assets/images/select easy.png");
-	difficulty[1].loadFromFile("Assets/images/select medium.png");
-	difficulty[2].loadFromFile("Assets/images/select hard.png");
+int SelectDifficulty(RenderWindow& window, string & name) {
+    int selectedOption = -1;
+    Texture background;
+    Sprite bg;
+    background.loadFromFile("Assets/images/select difficulty.png");
+    bg.setTexture(background);
+    bg.setScale(1.9, 1);
+    bg.setPosition(0, 0);
 
-	for (int i = 0; i < 3; i++)
-	{
-		df[i].setTexture(difficulty[i]);
-	}
+    Texture difficulty[3];
+    Sprite df[3];
+    difficulty[0].loadFromFile("Assets/images/select easy.png");
+    difficulty[1].loadFromFile("Assets/images/select medium.png");
+    difficulty[2].loadFromFile("Assets/images/select hard.png");
 
-	while (window.isOpen())
-	{
-		Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == Event::Closed)
-			{
-				window.close();
-			}
+    bool enter = true;
 
-			if (Keyboard::isKeyPressed(Keyboard::Escape))
-			{
-				return 1000;
-			}
+    Font font;
+    font.loadFromFile("Assets/font/Prison Tattoo.ttf");
+    Text t[2];
+    for (int i = 0; i < 2; i++)
+    {
+        t[i].setFont(font);
+        t[i].setCharacterSize(70);
+        t[i].setFillColor(Color::White);
+        t[i].setPosition(500+i*450, 400);
+    }
+    t[0].setString("Name Player ");
 
-			if (event.type == Event::MouseMoved)
-			{
-				select_checkMouseHover(window, df, 3, selectedOption);
-			}
+    Clock clock;
+    bool showCursor = true;
+    Time blinkTime = seconds(0.5f);
 
-			if (event.type == Event::MouseButtonPressed) {
-				if (event.mouseButton.button == Mouse::Left)
-				{
-					if (selectedOption != -1)
-					{
-						return selectedOption;
+    Text cursor;
+    cursor.setFont(font);
+    cursor.setString("|");
+    cursor.setCharacterSize(70);
+    cursor.setFillColor(Color::White);
 
-					}
-				}
-			}
-		}
+    for (int i = 0; i < 3; i++)
+    {
+        df[i].setTexture(difficulty[i]);
+    }
 
-		window.clear();
-		window.draw(bg);
+    while (window.isOpen())
+    {
+        Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == Event::Closed)
+            {
+                window.close();
+            }
+            if (event.type == Event::MouseMoved&&!enter)
+            {
+                select_checkMouseHover(window, df, 3, selectedOption);
+            }
 
-		for (int i = 0; i < 3; i++)
-		{
-			if (selectedOption == i)
-			{
-				df[i].setScale(1.2f, 1.2f);
-				df[i].setPosition(400 * i + 400 - 20, 550 - 20);
-				df[i].setColor(i == 0 ? Color::Green : (i == 1 ? Color::Yellow : Color::Red));
-			}
-			else
-			{
-				df[i].setScale(1.f, 1.f);
-				df[i].setColor(Color::White);
-				df[i].setPosition(400 * i + 400, 550);
-			}
+            if (event.type == Event::MouseButtonPressed&&!enter) {
+                if (event.mouseButton.button == Mouse::Left)
+                {
+                    if (selectedOption != -1)
+                    {
+                        return selectedOption;
 
-			window.draw(df[i]);
-		}
+                    }
+                }
+            }
 
-		window.display();
-	}
+            if (event.type == Event::TextEntered)
+            {
+
+                if (enter)
+                {
+                    if (name.size() < 10)
+                    {
+                        name += static_cast<char>(event.text.unicode);
+                    }
+                }
+            }
+
+            if (Keyboard::isKeyPressed(Keyboard::BackSpace))
+            {
+                if (enter && name.size() > 0)
+                {
+                    name.resize(name.size() - 1);
+                }
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Enter) && name.size() > 1)
+            {
+                enter = false;
+            }
+            
+        }
+        t[1].setString(name);
+
+        window.clear();
+        window.draw(bg);           
+        window.draw(t[1]);
+        window.draw(t[0]);
+
+        if (enter && showCursor)
+        {
+            cursor.setPosition(t[1].getPosition().x + t[1].getGlobalBounds().width + 5, t[1].getPosition().y);
+            window.draw(cursor);
+        }
+        if (clock.getElapsedTime() >= blinkTime)
+        {
+            showCursor = !showCursor;
+            clock.restart();
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (selectedOption == i)
+            {
+                df[i].setScale(1.2f, 1.2f);
+                df[i].setPosition(400 * i + 400 - 20, 550 - 20);
+                df[i].setColor(i == 0 ? Color::Green : (i == 1 ? Color::Yellow : Color::Red));
+            }
+            else
+            {
+                df[i].setScale(1.f, 1.f);
+                df[i].setColor(Color::White);
+                df[i].setPosition(400 * i + 400, 550);
+            }
+
+            window.draw(df[i]);
+        }
+
+        window.display();
+    }
 }
 
 
-int Game_Play(RenderWindow& window, int level, SoundManager& soundManagerr) {
-	window.setFramerateLimit(60);
-	bool checkstart = 1;
-	Graph g;
-	pacman player(19, 20);
-	TileRenderer tileRenderer(48, level);
-	ghost myghost;
+int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundManagerr) {
+    window.setFramerateLimit(60);
+    bool checkstart = 1;
+    Graph g;
+    pacman player(19, 20);
+    TileRenderer tileRenderer(48, level);
+    ghost myghost;
 
-	tileRenderer.initializeFood();
+    tileRenderer.initializeFood();
 
-	// Score setup
-	player.score.value = 0;
-	player.score.userName = "test";
-	Font font;
-	font.loadFromFile("Assets/font/Prison Tattoo.ttf");
-
+    // Score setup
+    int score = 0;
+    Font font;
+    font.loadFromFile("Assets/font/Prison Tattoo.ttf");
 
 
-	Text scoreText;
-	scoreText.setFont(font);
-	scoreText.setCharacterSize(55);
-	scoreText.setFillColor(Color::White);
 
-	auto& foodList = tileRenderer.getfoodList();
+    Text scoreText;
+    scoreText.setFont(font);
+    scoreText.setCharacterSize(55);
+    scoreText.setFillColor(Color::White);
 
 
-	// Game loop
-	while (window.isOpen()) {
-		Event event;
-		while (window.pollEvent(event)) {
-			if (event.type == Event::Closed) window.close();
-			if (Keyboard::isKeyPressed(Keyboard::Escape)) return 1000;
-		}
+    Text t;
 
-		player.movement();
-		myghost.movement(player, g);
+    t.setFont(font);
+    t.setCharacterSize(40);
+    t.setFillColor(Color::White);
+    t.setPosition(920-(name.size()*6), 0);
+    t.setString(name);
 
-		for (auto it = foodList.begin(); it != foodList.end(); ) {
-			if (player.pacsprite.getGlobalBounds().intersects((*it)->getBounds())) {
-				if ((*it)->getValueScore() == 1) { soundManagerr.sound[2].stop();soundManagerr.sound[2].play(); }
-				if ((*it)->getValueScore() == 20) { soundManagerr.sound[3].stop(); soundManagerr.sound[3].play(); }
-				if ((*it)->getValueScore() == 10)
-				{
-					soundManagerr.sound[4].stop();
-					soundManagerr.sound[4].setLoop(true);
-					soundManagerr.sound[4].play();
-					soundManagerr.sound[5].stop();
-				}
-				player.score.value += (*it)->getValueScore();
-				it = foodList.erase(it);
-			}
-			else {
-				++it;
-			}
-		}
+    auto& foodList = tileRenderer.getfoodList();
 
-		// Update score text
-		scoreText.setString(std::to_string(player.score.value));
-		if (player.score.value < 10) scoreText.setPosition(910, 45);
-		else if (player.score.value < 100) scoreText.setPosition(890, 45);
-		else scoreText.setPosition(880, 45);
 
-		// Render
-		window.clear();
-		tileRenderer.draw(window);
-		player.draw(window);
-		myghost.draw(window);
-		window.draw(scoreText);
-		window.display();
-		if (checkstart) {
+    // Game loop
+    while (window.isOpen()) {
+        Event event;
+        while (window.pollEvent(event)) {
+            if (event.type == Event::Closed) window.close();
+            if (Keyboard::isKeyPressed(Keyboard::Escape)) return 1000;
+        }
 
-			Sleep(4300);
-			soundManagerr.sound[5].setLoop(true);
-			soundManagerr.sound[5].play();
-			checkstart = 0;
+        player.movement();
+        myghost.movement(player, g);
 
-		}
+        for (auto it = foodList.begin(); it != foodList.end(); ) {
+            if (player.pacsprite.getGlobalBounds().intersects((*it)->getBounds())) {
+                if ((*it)->getValueScore() == 1) {
+                    soundManagerr.sound[2].stop();soundManagerr.sound[2].play(); 
+                }
+                if ((*it)->getValueScore() == 20) { soundManagerr.sound[3].stop(); soundManagerr.sound[3].play(); }
+                if ((*it)->getValueScore() == 10)
+                {
+                    myghost.setVulnerable();
+                    soundManagerr.sound[4].stop();
+                    soundManagerr.sound[4].setLoop(true);
+                    soundManagerr.sound[4].play();
+                    soundManagerr.sound[5].stop();
+                }
+                score += (*it)->getValueScore();
+                it = foodList.erase(it);
+            }
+            else {
+                ++it;
+            }
+        }
 
-	}
+        // Update score text
+        scoreText.setString(std::to_string(score));
+        if (score < 10) scoreText.setPosition(950, 45);
+        else if (score < 100) scoreText.setPosition(930, 45);
+        else scoreText.setPosition(910, 45);
+
+        // Render
+        window.clear();
+        tileRenderer.draw(window);
+        player.draw(window);
+        myghost.draw(window);
+        window.draw(scoreText);
+        window.draw(t);
+        window.display();
+        if (checkstart) {
+
+            Sleep(4300);
+            soundManagerr.sound[5].setLoop(true);
+            soundManagerr.sound[5].play();
+            checkstart = 0;
+
+        }
+
+    }
 }
