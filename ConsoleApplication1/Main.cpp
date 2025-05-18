@@ -48,12 +48,12 @@ using namespace sf;
 
 int Design(RenderWindow& window);
 int instruction(RenderWindow& window);
-int Game_Play(RenderWindow& window, int level, SoundManager& soundManagerr);
+int Game_Play(RenderWindow& window, int level,string &name, SoundManager& soundManagerr);
 void drawMenu(RenderWindow& window, Menu& menu, Sprite& bg);
 void handleEvents(RenderWindow& window, Menu& menu, int& pagenum);
 void numphoto_checkMouseHover(RenderWindow& window, RectangleShape numplay[], int& selectedOption);
 void select_checkMouseHover(RenderWindow& window, Sprite difficulty[], int numphoto, int& selectedOption);
-int SelectDifficulty(RenderWindow& window);
+int SelectDifficulty(RenderWindow& window,string &name);
 
 
 
@@ -81,6 +81,7 @@ int main() {
     bg.setPosition(0, -200);
     bg.setTexture(mainmenubg);
 
+    string name;
 
     while (true) {
 
@@ -94,10 +95,10 @@ int main() {
                 drawMenu(window, menu, bg);
             }
             if (pagenum == 0) {
-                int level = SelectDifficulty(window);
+                int level = SelectDifficulty(window,name);
                 soundManagerr.sound[0].stop();
                 soundManagerr.sound[1].play();
-                pagenum = Game_Play(window, level, soundManagerr);
+                pagenum = Game_Play(window, level, name, soundManagerr);
                 soundManagerr.sound[0].play();
             }
             if (pagenum == -1) {
@@ -411,7 +412,7 @@ void select_checkMouseHover(RenderWindow& window, Sprite difficulty[], int numph
         selectedOption = -1;
     }
 }
-int SelectDifficulty(RenderWindow& window) {
+int SelectDifficulty(RenderWindow& window, string & name) {
     int selectedOption = -1;
     Texture background;
     Sprite bg;
@@ -425,6 +426,30 @@ int SelectDifficulty(RenderWindow& window) {
     difficulty[0].loadFromFile("Assets/images/select easy.png");
     difficulty[1].loadFromFile("Assets/images/select medium.png");
     difficulty[2].loadFromFile("Assets/images/select hard.png");
+
+    bool enter = true;
+
+    Font font;
+    font.loadFromFile("Assets/font/Prison Tattoo.ttf");
+    Text t[2];
+    for (int i = 0; i < 2; i++)
+    {
+        t[i].setFont(font);
+        t[i].setCharacterSize(70);
+        t[i].setFillColor(Color::White);
+        t[i].setPosition(500+i*450, 400);
+    }
+    t[0].setString("Name Player ");
+
+    Clock clock;
+    bool showCursor = true;
+    Time blinkTime = seconds(0.5f);
+
+    Text cursor;
+    cursor.setFont(font);
+    cursor.setString("|");
+    cursor.setCharacterSize(70);
+    cursor.setFillColor(Color::White);
 
     for (int i = 0; i < 3; i++)
     {
@@ -440,18 +465,12 @@ int SelectDifficulty(RenderWindow& window) {
             {
                 window.close();
             }
-
-            if (Keyboard::isKeyPressed(Keyboard::Escape))
-            {
-                return 1000;
-            }
-
-            if (event.type == Event::MouseMoved)
+            if (event.type == Event::MouseMoved&&!enter)
             {
                 select_checkMouseHover(window, df, 3, selectedOption);
             }
 
-            if (event.type == Event::MouseButtonPressed) {
+            if (event.type == Event::MouseButtonPressed&&!enter) {
                 if (event.mouseButton.button == Mouse::Left)
                 {
                     if (selectedOption != -1)
@@ -461,10 +480,49 @@ int SelectDifficulty(RenderWindow& window) {
                     }
                 }
             }
+
+            if (event.type == Event::TextEntered)
+            {
+
+                if (enter)
+                {
+                    if (name.size() < 10)
+                    {
+                        name += static_cast<char>(event.text.unicode);
+                    }
+                }
+            }
+
+            if (Keyboard::isKeyPressed(Keyboard::BackSpace))
+            {
+                if (enter && name.size() > 0)
+                {
+                    name.resize(name.size() - 1);
+                }
+            }
+            if (Keyboard::isKeyPressed(Keyboard::Enter) && name.size() > 1)
+            {
+                enter = false;
+            }
+            
         }
+        t[1].setString(name);
 
         window.clear();
-        window.draw(bg);
+        window.draw(bg);           
+        window.draw(t[1]);
+        window.draw(t[0]);
+
+        if (enter && showCursor)
+        {
+            cursor.setPosition(t[1].getPosition().x + t[1].getGlobalBounds().width + 5, t[1].getPosition().y);
+            window.draw(cursor);
+        }
+        if (clock.getElapsedTime() >= blinkTime)
+        {
+            showCursor = !showCursor;
+            clock.restart();
+        }
 
         for (int i = 0; i < 3; i++)
         {
@@ -489,7 +547,7 @@ int SelectDifficulty(RenderWindow& window) {
 }
 
 
-int Game_Play(RenderWindow& window, int level, SoundManager& soundManagerr) {
+int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundManagerr) {
     window.setFramerateLimit(60);
     bool checkstart = 1;
     Graph g;
@@ -510,6 +568,15 @@ int Game_Play(RenderWindow& window, int level, SoundManager& soundManagerr) {
     scoreText.setFont(font);
     scoreText.setCharacterSize(55);
     scoreText.setFillColor(Color::White);
+
+
+    Text t;
+
+    t.setFont(font);
+    t.setCharacterSize(40);
+    t.setFillColor(Color::White);
+    t.setPosition(920-(name.size()*6), 0);
+    t.setString(name);
 
     auto& foodList = tileRenderer.getfoodList();
 
@@ -549,9 +616,9 @@ int Game_Play(RenderWindow& window, int level, SoundManager& soundManagerr) {
 
         // Update score text
         scoreText.setString(std::to_string(score));
-        if (score < 10) scoreText.setPosition(910, 45);
-        else if (score < 100) scoreText.setPosition(890, 45);
-        else scoreText.setPosition(880, 45);
+        if (score < 10) scoreText.setPosition(950, 45);
+        else if (score < 100) scoreText.setPosition(930, 45);
+        else scoreText.setPosition(910, 45);
 
         // Render
         window.clear();
@@ -559,6 +626,7 @@ int Game_Play(RenderWindow& window, int level, SoundManager& soundManagerr) {
         player.draw(window);
         myghost.draw(window);
         window.draw(scoreText);
+        window.draw(t);
         window.display();
         if (checkstart) {
 
