@@ -7,7 +7,7 @@ using namespace sf;
 
 class pacman {
 public:
-    pacman(int x,int y);
+    pacman(int x, int y);
 
     void movement();
     void draw(RenderWindow& window);
@@ -16,11 +16,11 @@ public:
     Sprite pacsprite;
     int nextStatus;
 
-    Score score;
     bool isDying;
     bool isDead;
-    float frameDuration = 0.18f;
-    
+    float frameDuration = 0.3f;
+    Score score;
+
 
 public:
     int count = 0;

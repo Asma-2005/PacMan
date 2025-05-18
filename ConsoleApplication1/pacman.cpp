@@ -2,38 +2,38 @@
 #include "ghost.h"
 #include <SFML/Window/Keyboard.hpp>
 #include<dsound.h>
-pacman::pacman(int pacx,int pacy) {
+pacman::pacman(int pacx, int pacy) {
 
     pactexture.loadFromFile("Assets/Textures/PacMan16.png");
     pacDeath.loadFromFile("Assets/Textures/GameOver32.png");
     pacsprite.setTexture(pactexture);
     pacsprite.setTextureRect(IntRect(4 * 16, 0, 16, 16));
     pacsprite.setScale(3, 3);
-    pacsprite.setPosition(g.NODESIZE*pacx, g.NODESIZE*pacy);
+    pacsprite.setPosition(g.NODESIZE * pacx, g.NODESIZE * pacy);
     frame = 0;
     speed = 2.0f;
     status = -1;
     restframe = 0;
-	isDying = false;
-	isDead = false;
-    
+    isDying = false;
+    isDead = false;
+
 }
 void pacman::movement() {
-   
- 
+
+
     if (pacman::isDying == 1) {
 
         pacsprite.setTexture(pacDeath);
-        pacsprite.setScale(1.7, 1.7);
+        pacsprite.setScale(1.6, 1.6);
 
-        if (count<11) {  
+        if (count < 11) {
 
             if (dyingClock.getElapsedTime().asSeconds() >= frameDuration)
             {
-                pacsprite.setTextureRect(IntRect((f)* 32, 0, 32, 32));
+                pacsprite.setTextureRect(IntRect((f) * 32, 0, 32, 32));
                 f++;
-            count++;
-			dyingClock.restart();
+                count++;
+                dyingClock.restart();
             }
         }
         else {
@@ -121,13 +121,13 @@ void pacman::movement() {
 
 }
 void pacman::draw(RenderWindow& window) {
-    if (! pacman:: isDying|| !pacman::isDead)
+    if (!pacman::isDying || !pacman::isDead)
     {
 
-    window.draw(pacsprite);
+        window.draw(pacsprite);
     }
 
-  }
+}
 
 
 

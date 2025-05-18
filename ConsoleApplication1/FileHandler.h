@@ -2,6 +2,7 @@
 #include <fstream>  
 #include<nlohmann/json.hpp>
 #include "string.h"
+#include "Score.h"
 using json = nlohmann::json;
 using namespace std;
 

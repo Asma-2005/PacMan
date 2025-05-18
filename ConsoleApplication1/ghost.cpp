@@ -17,6 +17,7 @@ ghost::ghost() {
     moveCounter = 0;
     vulnerable = false;
 }
+
 void ghost::setVulnerable() {
     vulnerable = true;
     vulnerableClock.restart();    
@@ -26,12 +27,11 @@ void ghost::setVulnerable() {
 void ghost::movement(pacman& player, Graph& g) {
 
     if (checkCollision(player)) {
-		ghost::isVisible = false;
-        player.pacsprite.setTexture(player.pacDeath); 
+        ghost::isVisible = false;
+        player.pacsprite.setTexture(player.pacDeath);
         player.isDying = 1;
-	//	ghostSprite.setPosition(-100, -100);
+        //	ghostSprite.setPosition(-100, -100);
     }
-
 
     // get char current pos
     Vector2f ghostPos = ghostSprite.getPosition();
@@ -141,18 +141,18 @@ void ghost::movement(pacman& player, Graph& g) {
 bool ghost::checkCollision(pacman& player) {
     FloatRect ghostBounds = ghostSprite.getGlobalBounds();
     FloatRect pacmanBounds = player.pacsprite.getGlobalBounds();
-	//cout << "pac dying: " <<   player.isDying << endl;
+    //cout << "pac dying: " <<   player.isDying << endl;
     // very basic logic i'll edit it soon
     if (ghostBounds.intersects(pacmanBounds)) {
-     //   player.isDying = true;
+        //   player.isDying = true;
         return true;
     }
-  
+
 }
 
 void ghost::draw(RenderWindow& window) {
     if (ghost::isVisible)
     {
-    window.draw(ghostSprite);
+        window.draw(ghostSprite);
     }
 }

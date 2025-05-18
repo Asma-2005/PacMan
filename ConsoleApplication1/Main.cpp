@@ -57,15 +57,13 @@ void numphoto_checkMouseHover(RenderWindow& window, RectangleShape numplay[], in
 void select_checkMouseHover(RenderWindow& window, Sprite difficulty[], int numphoto, int& selectedOption);
 int SelectDifficulty(RenderWindow& window,string &name);
 int score_player(RenderWindow& window);
-int SelectDifficulty(RenderWindow& window);
 int showGameOverScreen(RenderWindow& window);
 
-
-bool DeathSoundBool = false;
 
 
 stack<Score> s;
 FileHandler score_file;
+bool DeathSoundBool = false;
 
 int main() {
     RenderWindow window(VideoMode(1920, 1080), "Game", Style::Fullscreen);
@@ -613,32 +611,14 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
         Event event;
         while (window.pollEvent(event)) {
             if (event.type == Event::Closed) window.close();
-            if (Keyboard::isKeyPressed(Keyboard::Escape))
-
-                return 1000;
+            if (Keyboard::isKeyPressed(Keyboard::Escape)) return 1000;
         }
-
-        myghost.movement(player, g);
         player.movement();
-
-        if (player.isDying &&!DeathSoundBool) {
-			soundManagerr.sound[5].stop();
-            soundManagerr.sound[6].play();
-           // soundManagerr.sound[6].stop();
-            DeathSoundBool = 1;
-        }
-        
-        if (player.isDead) {
-            cout << "Dead";
-            return showGameOverScreen(window);
-        
-        }
+        myghost.movement(player, g);
 
         for (auto it = foodList.begin(); it != foodList.end(); ) {
             if (player.pacsprite.getGlobalBounds().intersects((*it)->getBounds())) {
-                if ((*it)->getValueScore() == 1) {
-                    soundManagerr.sound[2].stop();soundManagerr.sound[2].play(); 
-                }
+                if ((*it)->getValueScore() == 1) {soundManagerr.sound[2].stop();soundManagerr.sound[2].play(); }
                 if ((*it)->getValueScore() == 20) { soundManagerr.sound[3].stop(); soundManagerr.sound[3].play(); }
                 if ((*it)->getValueScore() == 10)
                 {
@@ -646,8 +626,6 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
                     soundManagerr.sound[4].stop();
                     soundManagerr.sound[4].setLoop(true);
                     soundManagerr.sound[4].play();
-					//after 5 sec stop the sound
-					//soundManagerr.sound[4].stop();
                     soundManagerr.sound[5].stop();
                 }
                 player.score.value += (*it)->getValueScore();
@@ -672,6 +650,7 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
         window.draw(scoreText);
         window.draw(t);
         window.display();
+
         if (checkstart) {
 
             Sleep(4300);
@@ -681,15 +660,45 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
 
         }
 
+        if (player.isDying && !DeathSoundBool) {
+            soundManagerr.sound[5].stop();
+            soundManagerr.sound[6].play();
+            // soundManagerr.sound[6].stop();
+            DeathSoundBool = 1;
+        }
 
-        //Replace this with the winning condition or losing condition for the player. 
-        if (event.key.code == Keyboard::Enter)
-        {
+        if (player.isDead) {
             s.push(player.score);
             score_file.jsonWrite(s);
+            cout << "Dead";
+            return showGameOverScreen(window);
+
         }
+
+        
     }
 }
+
+
+
+int showGameOverScreen(RenderWindow& window) {
+    Texture gameOverTexture;
+    if (!gameOverTexture.loadFromFile("Assets/images/GameOver4.jpg")) {
+        cout << "ERROR: Can't load game_over.png\n";
+        return 1000;
+    }
+    Sprite gameOverSprite;
+    gameOverSprite.setTexture(gameOverTexture);
+    gameOverSprite.setPosition(0, 0);
+
+    Clock timer;
+    while (timer.getElapsedTime().asSeconds() < 3.0f) {
+        window.draw(gameOverSprite);
+        window.display();
+    }
+    return 1000;
+}
+
 
 int score_player(RenderWindow& window) {
     stack<Score> score = s;
@@ -736,6 +745,9 @@ int score_player(RenderWindow& window) {
     }
 }
 
+
+
+
 int drowendgame(RenderWindow& window , int score ,string name ,bool winner ) {
     Texture background;
     Sprite bg;
@@ -774,21 +786,4 @@ int drowendgame(RenderWindow& window , int score ,string name ,bool winner ) {
         window.draw(txt_winner);
         window.display();
     }
-}
-int showGameOverScreen(RenderWindow& window) {
-    Texture gameOverTexture;
-    if (!gameOverTexture.loadFromFile("Assets/images/GameOver4.jpg")) {
-        cout << "ERROR: Can't load game_over.png\n";
-        return 1000;
-    }
-    Sprite gameOverSprite;
-    gameOverSprite.setTexture(gameOverTexture);
-    gameOverSprite.setPosition(0,0);
-
-    Clock timer;
-    while (timer.getElapsedTime().asSeconds() < 3.0f) {
-        window.draw(gameOverSprite);
-		window.display();
-    }
-    return 1000;
 }

@@ -10,16 +10,16 @@ class ghost
 public:
     ghost();
     void setVulnerable();
-    void movement(pacman& pac ,Graph& g);
+    void movement(pacman& pac, Graph& g);
     void draw(RenderWindow& window);
     bool checkCollision(pacman& pac);
+    bool isVulnerable();
+
     int i, j;
     Sprite ghostSprite;
     int moveCounter;
     vector<int> path;
-    bool isVulnerable();
-
-	bool isVisible=1;
+    bool isVisible = 1;
 public:
     int status;
     Texture ghostWeakShape;
@@ -27,7 +27,11 @@ public:
     int frame;
     float speed;
     Graph g;
+
     bool vulnerable;
     float vulnerableDuration = 6.0f;
     Clock vulnerableClock;
+
 };
+
+  
