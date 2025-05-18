@@ -17,7 +17,7 @@ public:
 
     bool isDying;
     bool isDead;
-    float frameDuration = 0.3f;
+    float frameDuration = 0.18f;
     
 
 public:
