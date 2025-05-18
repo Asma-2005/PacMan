@@ -19,6 +19,7 @@ public:
     vector<int> path;
     bool isVulnerable();
 
+	bool isVisible=1;
 public:
     int status;
     Texture ghostWeakShape;

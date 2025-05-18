@@ -11,15 +11,23 @@ public:
 
     void movement();
     void draw(RenderWindow& window);
+    Clock dyingClock;
     int i, j;
     Sprite pacsprite;
     int nextStatus;
 
     Score score;
+    bool isDying;
+    bool isDead;
+    float frameDuration = 0.18f;
+    
 
 public:
+    int count = 0;
+    int f = 0;
     int status;
     Texture pactexture;
+    Texture pacDeath;
     int frame;
     float speed;
     int restframe;
