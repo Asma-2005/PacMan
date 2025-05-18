@@ -9,7 +9,7 @@ class ghost
 {
 public:
     ghost();
-
+    void setVulnerable();
     void movement(pacman& pac ,Graph& g);
     void draw(RenderWindow& window);
     bool checkCollision(pacman& pac);
@@ -17,13 +17,16 @@ public:
     Sprite ghostSprite;
     int moveCounter;
     vector<int> path;
+    bool isVulnerable();
 
 public:
     int status;
+    Texture ghostWeakShape;
     Texture ghostTex;
     int frame;
     float speed;
     Graph g;
-     
-
+    bool vulnerable;
+    float vulnerableDuration = 6.0f;
+    Clock vulnerableClock;
 };

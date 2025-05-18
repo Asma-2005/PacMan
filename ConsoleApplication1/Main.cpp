@@ -527,10 +527,13 @@ int Game_Play(RenderWindow& window, int level, SoundManager& soundManagerr) {
 
         for (auto it = foodList.begin(); it != foodList.end(); ) {
             if (player.pacsprite.getGlobalBounds().intersects((*it)->getBounds())) {
-                if ((*it)->getValueScore() == 1) { soundManagerr.sound[2].stop();soundManagerr.sound[2].play(); }
+                if ((*it)->getValueScore() == 1) {
+                    soundManagerr.sound[2].stop();soundManagerr.sound[2].play(); 
+                }
                 if ((*it)->getValueScore() == 20) { soundManagerr.sound[3].stop(); soundManagerr.sound[3].play(); }
                 if ((*it)->getValueScore() == 10)
                 {
+                    myghost.setVulnerable();
                     soundManagerr.sound[4].stop();
                     soundManagerr.sound[4].setLoop(true);
                     soundManagerr.sound[4].play();
