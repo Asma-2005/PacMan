@@ -1,14 +1,12 @@
 ﻿#include "pacman.h"
 #include "ghost.h"
 #include <SFML/Window/Keyboard.hpp>
-
+#include<dsound.h>
 pacman::pacman(int pacx,int pacy) {
 
     pactexture.loadFromFile("Assets/Textures/PacMan16.png");
     pacDeath.loadFromFile("Assets/Textures/GameOver32.png");
     pacsprite.setTexture(pactexture);
-    deathsprite.setTexture(pacDeath);
-    deathsprite.setTextureRect(IntRect(0, 0, 32, 32));
     pacsprite.setTextureRect(IntRect(4 * 16, 0, 16, 16));
     pacsprite.setScale(3, 3);
     pacsprite.setPosition(g.NODESIZE*pacx, g.NODESIZE*pacy);
@@ -24,30 +22,26 @@ void pacman::movement() {
    
  
     if (pacman::isDying == 1) {
-        if (count<11) {  // Assuming 32 frames in the sprite sheet
-          //  pacman::isDying = 1;
+
+        pacsprite.setTexture(pacDeath);
+        pacsprite.setScale(1.7, 1.7);
+
+        if (count<11) {  
+
             if (dyingClock.getElapsedTime().asSeconds() >= frameDuration)
             {
-            deathsprite.setTextureRect(IntRect((f%10) * 32, 0, 32, 32));
+                pacsprite.setTextureRect(IntRect((f)* 32, 0, 32, 32));
                 f++;
             count++;
 			dyingClock.restart();
             }
         }
         else {
-            // Animation complete
             pacman::isDying = false;
             pacman::isDead = true;
-            cout << "slllllsssssssssssssssssssssssssssssssssssssssssssssssss";
-            deathsprite.setScale(0.0001, 0.001);
         }
     }
-
-
     else if (!pacman::isDead) {
-
-
-
 
         Vector2f pos = pacsprite.getPosition();
         i = static_cast<int>(pos.y) / g.NODESIZE;

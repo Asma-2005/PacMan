@@ -13,7 +13,6 @@ public:
     Clock dyingClock;
     int i, j;
     Sprite pacsprite;
-    Sprite deathsprite;
     int nextStatus;
 
     bool isDying;
