@@ -16,6 +16,7 @@ ghost::ghost(int x,int y) {
     status = -1;
     moveCounter = 0;
     vulnerable = false;
+
 }
 
 void ghost::setVulnerable() {
@@ -25,19 +26,10 @@ void ghost::setVulnerable() {
     ghostSprite.setTextureRect(IntRect(0, 0, 30, 30));
 }
 void ghost::movement(pacman& player, Graph& g) {
-
-    if (checkCollision(player)) {
-        ghost::isVisible = false;
-        player.pacsprite.setTexture(player.pacDeath);
-        player.isDying = 1;
-        //	ghostSprite.setPosition(-100, -100);
-    }
-
-    // get char current pos
     Vector2f ghostPos = ghostSprite.getPosition();
     Vector2f pacmanPos = player.pacsprite.getPosition();
 
-    // positions to node indices(adj list)
+
     int ghostI = static_cast<int>(ghostPos.y) / Graph::NODESIZE;
     int ghostJ = static_cast<int>(ghostPos.x) / Graph::NODESIZE;
     int pacmanI = static_cast<int>(pacmanPos.y) / Graph::NODESIZE;
@@ -45,6 +37,28 @@ void ghost::movement(pacman& player, Graph& g) {
 
     int ghostNodeId = ghostI * Graph::COLS + ghostJ;
     int pacmanNodeId = pacmanI * Graph::COLS + pacmanJ;
+
+    if (checkCollision(player)) {
+
+        if (vulnerable)
+        {
+           
+            path = g.bfs(ghostNodeId, homeId);
+
+        }
+        else
+        {
+            ghost::isVisible = false;
+            player.pacsprite.setTexture(player.pacDeath);
+            player.isDying = 1;
+            //	ghostSprite.setPosition(-100, -100);
+        }
+    }
+
+    // get char current pos
+   
+    // positions to node indices(adj list)
+   
     if (vulnerable && vulnerableClock.getElapsedTime().asSeconds() > vulnerableDuration) {
         vulnerable = false;
         ghostSprite.setTexture(ghostTex); 
@@ -52,7 +66,7 @@ void ghost::movement(pacman& player, Graph& g) {
     moveCounter++;
     if (moveCounter >= 20) {  // calc new path every 20 frames(3shan el ghost maydokhsh)
         int targetNodelId; 
-        if (vulnerable) {
+        if (vulnerable && !isDying) {
             float maxDist = -1;
             int farthestNode = ghostNodeId;
             for (int i = 0; i < Graph::ROWS; i++) {
@@ -69,6 +83,10 @@ void ghost::movement(pacman& player, Graph& g) {
                 }
             }
             targetNodelId = farthestNode;
+        }
+        else if (isDying)
+        {
+            targetNodelId=homeId;
         }
         else {
             targetNodelId = pacmanNodeId;

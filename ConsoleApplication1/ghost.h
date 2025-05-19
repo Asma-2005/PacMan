@@ -14,12 +14,14 @@ public:
     void draw(RenderWindow& window);
     bool checkCollision(pacman& pac);
     bool isVulnerable();
-
+    bool isDying = 0;
     int i, j;
     Sprite ghostSprite;
     int moveCounter;
     vector<int> path;
     bool isVisible = 1;
+    int homeId = 18 * Graph::COLS + 11;
+
 public:
     int status;
     Texture ghostWeakShape;
