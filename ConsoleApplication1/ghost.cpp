@@ -5,7 +5,7 @@ bool ghost::isVulnerable() {
     return vulnerable;
 }
 ghost::ghost() {
-    ghostWeakShape.loadFromFile("Assets/Textures/GhostBody32.png");
+    ghostWeakShape.loadFromFile("Assets/images/GhostBody32.png");
     ghostTex.loadFromFile("Assets/images/enemy_spritethis.png");
     ghostSprite.setTexture(ghostTex);
     ghostSprite.setTextureRect(IntRect(0, 0, 30, 30));
@@ -22,7 +22,7 @@ void ghost::setVulnerable() {
     vulnerable = true;
     vulnerableClock.restart();    
     ghostSprite.setTexture(ghostWeakShape);
-    ghostSprite.setTextureRect(IntRect(0, 0, 32, 32));
+    ghostSprite.setTextureRect(IntRect(0, 0, 30, 30));
 }
 void ghost::movement(pacman& player, Graph& g) {
 
