@@ -577,8 +577,15 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
     Graph g;
     pacman player(19, 20);
     TileRenderer tileRenderer(48, level);
-    ghost myghost;
+    ghost myghost(18,11);
+    ghost myghost1(17, 11);
+    ghost myghost2(21, 11);
+    ghost myghost3(22, 11);
 
+
+    Clock clock;
+    int numghost = 1;
+    int countclock = 0;
     tileRenderer.initializeFood();
 
     // Score setup
@@ -615,6 +622,9 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
         }
         player.movement();
         myghost.movement(player, g);
+        if (numghost >= 2)myghost1.movement(player, g);
+        if (numghost >= 3)myghost2.movement(player, g);
+        if (numghost >= 4)myghost3.movement(player, g);
 
         for (auto it = foodList.begin(); it != foodList.end(); ) {
             if (player.pacsprite.getGlobalBounds().intersects((*it)->getBounds())) {
@@ -623,6 +633,9 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
                 if ((*it)->getValueScore() == 10)
                 {
                     myghost.setVulnerable();
+                    if (numghost >= 2)myghost1.setVulnerable();
+                    if (numghost >= 3)myghost2.setVulnerable();
+                    if (numghost >= 4)myghost3.setVulnerable();
                     soundManagerr.sound[4].stop();
                     soundManagerr.sound[4].setLoop(true);
                     soundManagerr.sound[4].play();
@@ -634,6 +647,12 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
             else {
                 ++it;
             }
+        }
+        if (clock.getElapsedTime().asSeconds() > 5.0f) {
+            countclock++;clock.restart();
+        }
+        if (countclock > 3) {
+            numghost++;countclock = 0;
         }
 
         // Update score text
@@ -647,9 +666,17 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
         tileRenderer.draw(window);
         player.draw(window);
         myghost.draw(window);
+        myghost1.draw(window);
+        myghost2.draw(window);
+        myghost3.draw(window);
         window.draw(scoreText);
         window.draw(t);
         window.display();
+
+        if (myghost.vulnerable && myghost.vulnerableClock.getElapsedTime().asSeconds() > myghost.vulnerableDuration) {
+            soundManagerr.sound[4].stop();
+            soundManagerr.sound[5].play();
+        }
 
         if (checkstart) {
 

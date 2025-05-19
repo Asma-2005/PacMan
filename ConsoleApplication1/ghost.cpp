@@ -4,13 +4,13 @@
 bool ghost::isVulnerable() {
     return vulnerable;
 }
-ghost::ghost() {
+ghost::ghost(int x,int y) {
     ghostWeakShape.loadFromFile("Assets/images/GhostBody32.png");
     ghostTex.loadFromFile("Assets/images/enemy_spritethis.png");
     ghostSprite.setTexture(ghostTex);
     ghostSprite.setTextureRect(IntRect(0, 0, 30, 30));
     ghostSprite.setScale(1.5, 1.5);
-    ghostSprite.setPosition(g.NODESIZE, g.NODESIZE);
+    ghostSprite.setPosition(g.NODESIZE*x, g.NODESIZE*y);
     frame = 0;
     speed = 1.0f;  
     status = -1;

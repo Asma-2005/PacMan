@@ -16,7 +16,7 @@ public:
 
 private:
     int tileSize;
-    Texture texture0;
-    Sprite sprite0;
+    Texture texture0, texture1;
+    Sprite sprite0, sprite1;
     vector<unique_ptr<Food>> foodList; 
 };

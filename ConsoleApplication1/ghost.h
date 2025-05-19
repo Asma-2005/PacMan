@@ -8,7 +8,7 @@ using namespace sf;
 class ghost
 {
 public:
-    ghost();
+    ghost(int x,int y);
     void setVulnerable();
     void movement(pacman& pac, Graph& g);
     void draw(RenderWindow& window);
