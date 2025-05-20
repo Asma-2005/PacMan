@@ -19,8 +19,8 @@ protected:
 public:
     // Updated constructor to accept position and size
     Food(FoodType type, int value, Vector2f pos, Vector2f sz);
-    virtual sf::FloatRect getBounds() const {
-        return sf::FloatRect(position.x, position.y, size.x, size.y);
+    virtual FloatRect getBounds() const {
+        return FloatRect(position.x, position.y, size.x, size.y);
     }
     virtual void draw(RenderWindow& window) = 0;
     void setEaten();

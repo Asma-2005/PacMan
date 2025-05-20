@@ -26,7 +26,7 @@ TileRenderer::TileRenderer(int tileSize, int level)
         tileSize / (float)texture1.getSize().x,
         2
     );
-    
+
 
 }
 
@@ -77,7 +77,7 @@ void TileRenderer::initializeFood() {
 }
 
 std::vector<std::unique_ptr<Food>>& TileRenderer::getfoodList() {
-    return foodList; 
+    return foodList;
 }
 void TileRenderer::checklevel(int level) {
     if (level == 0)
