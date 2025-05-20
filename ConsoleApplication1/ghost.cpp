@@ -37,29 +37,26 @@ void ghost::movement(pacman& player, Graph& g) {
 
     int ghostNodeId = ghostI * Graph::COLS + ghostJ;
     int pacmanNodeId = pacmanI * Graph::COLS + pacmanJ;
-
     if (checkCollision(player)) {
-
-        if (vulnerable)
-        {
-           
+        if (vulnerable) {
+            isDying = 1;
             path = g.bfs(ghostNodeId, homeId);
+            moveCounter = 20;  // Force path recalculation immediately
+            std::cout << "Ghost is dying. Current node: " << ghostNodeId << ", Target node: " << homeId << std::endl;
 
         }
-        else
-        {
+        else {
             ghost::isVisible = false;
             player.pacsprite.setTexture(player.pacDeath);
             player.isDying = 1;
-            //	ghostSprite.setPosition(-100, -100);
         }
-    }
+    }   
 
     // get char current pos
    
     // positions to node indices(adj list)
    
-    if (vulnerable && vulnerableClock.getElapsedTime().asSeconds() > vulnerableDuration) {
+    if (vulnerable && vulnerableClock.getElapsedTime().asSeconds() > 10.0f) {
         vulnerable = false;
         ghostSprite.setTexture(ghostTex); 
     }
@@ -87,6 +84,29 @@ void ghost::movement(pacman& player, Graph& g) {
         else if (isDying)
         {
             targetNodelId=homeId;
+			speed = 5.0f;
+            if (ghostNodeId == homeId)
+            {
+
+				isFrozen = 1;
+                isDying = 0;
+                freezeClock.restart();
+                //speed = 0.0f;   
+            }
+        }
+
+        else if(isFrozen)
+        {
+            if (freezeClock.getElapsedTime().asSeconds() >= 5.0f) {
+            
+                speed = 1.0f;
+				isFrozen = 0;
+                vulnerable = 0;
+            }
+            else {
+                return;  
+            }
+
         }
         else {
             targetNodelId = pacmanNodeId;

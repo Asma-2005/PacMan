@@ -20,7 +20,10 @@ public:
     int moveCounter;
     vector<int> path;
     bool isVisible = 1;
+    bool isFrozen = 0;
     int homeId = 18 * Graph::COLS + 11;
+    Clock freezeClock;
+    bool freezeStarts = 0;
 
 public:
     int status;
