@@ -20,21 +20,21 @@
 //Music menu;  sound[0]
 //Music intro;  sound[1]
 //Music eat;   sound[2]
-//Music winnLife;   sound[3]
-//Music Death;   sound[4]
-//Music eat fruit; sound[5]
-//Music pacman eaten;  sound[6]
-//music winner; sound[7]
-//music game  sound[8]
+//Music eat fruit; sound[3]
+//music scatter ghost  sound[4]
+//Music siren;  sound[5]
+//Music winnLife;   sound[6]
+//Music Death;   sound[7]
+//music winner; sound[8]
 class SoundManager
 {
 
 public:
 
-    Music sound[8];
+    Music sound[9];
 
     bool initialize() {
-        /*if (!sound[0].openFromFile("Assets/Sounds/menu.wav")) {
+        if (!sound[0].openFromFile("Assets/Sounds/menu.wav")) {
             cout << "ERROR: Can't load sound menu.wav\n";
             return false;
         }
@@ -50,33 +50,33 @@ public:
             return false;
         }
 
-        if (!sound[3].openFromFile("Assets/Sounds/winLife.wav")) {
+        if (!sound[3].openFromFile("Assets/Sounds/eatFruit.wav")) {
             cout << "ERROR: Can't load  sound winLife.wav\n";
             return false;
         }
 
-        if (!sound[4].openFromFile("Assets/Sounds/Death.wav")) {
+        if (!sound[4].openFromFile("Assets/Sounds/scatter ghost.wav")) {
             cout << "ERROR: Can't load sound Death.wav\n";
             return false;
         }
 
-        if (!sound[5].openFromFile("Assets/Sounds/eatFruit.wav")) {
+        if (!sound[5].openFromFile("Assets/Sounds/siren.wav")) {
             cout << "ERROR: Can't load sound eatFruit.wav\n";
             return false;
         }
-
-        if (!sound[6].openFromFile("Assets/Sounds/pacmanEaten.wav"))
+        if (!sound[6].openFromFile("Assets/Sounds/PacDeath.wav"))
         {
-            cout << "ERROR: Can't load sound pacmanEaten.wav\n";
+            cout << "ERROR: Can't load sound PacDeath.wav\n";
             return false;
         }
 
+        /*
         if (!sound[7].openFromFile("Assets/Sounds/winner.wav")) {
             cout << "ERROR: Can't load sound winner.wav\n";
             return false;
         }
-        if (!sound[8].openFromFile("Assets/Sounds/game.wav")) {
-            cout << "ERROR: Can't load sound game.wav\n";
+        if (!sound[8].openFromFile("Assets/Sounds/GhostDeath.wav")) {
+            cout << "ERROR: Can't load sound GhostDeath.wav\n";
             return false;
         }
         */
@@ -84,6 +84,3 @@ public:
     }
 
 };
-
-
-
