@@ -4,21 +4,23 @@
 bool ghost::isVulnerable() {
     return vulnerable;
 }
-ghost::ghost(int x,int y,int i) {
+ghost::ghost(int x, int y,string photo) {
     ghostWeakShape.loadFromFile("Assets/images/GhostBody32.png");
-    ghostTex.loadFromFile("Assets/images/enemy_spritethis.png");
+    ghostEyes.loadFromFile("Assets/images/GhostEyes32.png");
+
+    ghostTex.loadFromFile(photo);
     ghostSprite.setTexture(ghostTex);
-    ghostSprite.setTextureRect(IntRect(0, 0, 30, 30));
+    ghostSprite.setTextureRect(IntRect(0, 0, 32, 30));
     ghostSprite.setScale(1.5, 1.5);
-    ghostSprite.setPosition(g.NODESIZE*x, g.NODESIZE*y);
+    ghostSprite.setPosition(g.NODESIZE * x, g.NODESIZE * y);
     frame = 0;
-    speed = 1.0f;  
+    speed = 1.0f;
     status = -1;
     moveCounter = 0;
     vulnerable = false;
-    lastVisitedNode = -1;
-    stationaryCounter = 0;
-    id = i;
+    isFrozen = 0;
+    counttime = 0;
+    
 }
 
 void ghost::setVulnerable() {
@@ -27,14 +29,7 @@ void ghost::setVulnerable() {
     ghostSprite.setTexture(ghostWeakShape);
     ghostSprite.setTextureRect(IntRect(0, 0, 30, 30));
 }
-
-/*
-adding prameter to movement int level
-0: call the bfs each 20 frame bfs
-1 : call a * each 20 frame a*
-2 : the hardest level will make its algorithm later
-*/
-void ghost::movement(pacman& player, Graph& g, int level) {
+void ghost::movement(pacman& player, Graph& g,int id) {
     Vector2f ghostPos = ghostSprite.getPosition();
     Vector2f pacmanPos = player.pacsprite.getPosition();
 
@@ -46,38 +41,26 @@ void ghost::movement(pacman& player, Graph& g, int level) {
 
     int ghostNodeId = ghostI * Graph::COLS + ghostJ;
     int pacmanNodeId = pacmanI * Graph::COLS + pacmanJ;
-
-    //this is to detect ghost stuck in a node
-    if (ghostNodeId == lastVisitedNode) { 
-        stationaryCounter++; 
-    }
-    else {
-        stationaryCounter = 0; 
-        lastVisitedNode = ghostNodeId; 
-    }
     if (checkCollision(player)) {
-        if (vulnerable) {
-            isDying = 1;
-            
-            path = g.bfs(ghostNodeId, homeId,0);
-            
-          
-            moveCounter = 20;  // Force path recalculation immediately
-            std::cout << "Ghost is dying. Current node: " << ghostNodeId << ", Target node: " << homeId << std::endl;
-
-        }
-        else {
-            ghost::isVisible = false;
-            player.pacsprite.setTexture(player.pacDeath);
-            player.isDying = 1;
-        }
+            if (vulnerable) {
+                isDying = 1;
+                path = g.bfs(ghostNodeId, homeId,0);
+                moveCounter = 20;
+                ghostSprite.setTexture(ghostEyes);
+            }
+            else {
+                ghost::isVisible = false;
+                player.pacsprite.setTexture(player.pacDeath);
+                player.isDying = 1;
+            }
+        
     }   
 
     // get char current pos
    
     // positions to node indices(adj list)
    
-    if (vulnerable && vulnerableClock.getElapsedTime().asSeconds() > 10.0f) {
+    if (vulnerable && vulnerableClock.getElapsedTime().asSeconds() > 10.0f && !isDying) {
         vulnerable = false;
         ghostSprite.setTexture(ghostTex); 
     }
@@ -101,55 +84,86 @@ void ghost::movement(pacman& player, Graph& g, int level) {
                 }
             }
             targetNodelId = farthestNode;
-        }
-        else if (isDying)
-        {
-            targetNodelId=homeId;
-			speed = 5.0f;
-            if (ghostNodeId == homeId)
+            if (id == 0)
             {
+                path = g.bfs(ghostNodeId, targetNodelId, id);
+            }
+            else if (id == 1)
+            {
+                path = g.a_star(ghostNodeId, targetNodelId);
 
-				isFrozen = 1;
+            }
+            else
+            {
+                path = g.dijkstra(ghostNodeId, targetNodelId);
+
+            }
+            moveCounter = 0;
+        }
+        else if (isDying) {
+            targetNodelId = homeId;
+            speed = 1.0f;
+            if (ghostNodeId == homeId) {
+                isFrozen = 1;
                 isDying = 0;
                 freezeClock.restart();
-                //speed = 0.0f;   
-            }
-        }
-
-        else if(isFrozen)
-        {
-            if (freezeClock.getElapsedTime().asSeconds() >= 5.0f) {
-            
-                speed = 1.0f;
-				isFrozen = 0;
-                vulnerable = 0;
+                ghostSprite.setTexture(ghostTex);
+				path.clear();
             }
             else {
-                return;  
-            }
+                if (id == 0)
+                {
+                    path = g.bfs(ghostNodeId, targetNodelId, id);
+                }
+                else if (id == 1)
+                {
+                    path = g.a_star(ghostNodeId, targetNodelId);
 
+                }
+                else
+                {
+                    path = g.dijkstra(ghostNodeId, targetNodelId);
+
+                }
+                moveCounter = 0;
+            }
+        }
+        else if (isFrozen) {
+            
+            ghostSprite.move(0, 0);
+            speed = 0.0f;
+			cout << counttime << endl;
+            if (freezeClock.getElapsedTime().asSeconds() >= 0.5f) {
+                counttime++;
+                freezeClock.restart();
+            }
+            if (counttime>10)
+            {
+                speed = 1.0f;
+                isFrozen = 0;
+                vulnerable = 0;
+                counttime = 0;
+            }
         }
         else {
             targetNodelId = pacmanNodeId;
-        }
-        
-        if(level==0){ 
-        path = g.bfs(ghostNodeId, targetNodelId,ghost::id);
-        }
-        else if(level==1)
-            path = g.a_star(ghostNodeId, targetNodelId);
-
-        else if (level == 2) {
-            if (ghost::id == 0)
-                path = g.bfs(ghostNodeId, targetNodelId, ghost::id);
-            else if (ghost::id == 1)
+            if (id == 0)
+            {
+                path = g.bfs(ghostNodeId, targetNodelId, id);
+            }
+            else if(id==1)
+            {
                 path = g.a_star(ghostNodeId, targetNodelId);
-          /*  else if(ghost::id==3)
-                path=g.dijkstra()*/
 
+            }
+            else
+            {
+                path = g.dijkstra(ghostNodeId, targetNodelId);
+
+            }
+            moveCounter = 0;
         }
         
-        moveCounter = 0;
     }
 
     // a valid path with at lEAST one node
@@ -185,25 +199,25 @@ void ghost::movement(pacman& player, Graph& g, int level) {
         if (status == 0 && (g.pacmanMatrix[ghostI][ghostJ + 1] != 0 || (ghostSprite.getPosition().x != Graph::nodesInfo[ghostI * Graph::COLS + ghostJ].XstartPoint && ghostSprite.getPosition().y == Graph::nodesInfo[ghostI * Graph::COLS + ghostJ].YstartPoint && g.pacmanMatrix[ghostI][ghostJ + 1] == 0))) {  // Right
             frame++;
             int frameIndex = frame % 2;
-            ghostSprite.setTextureRect(IntRect(frameIndex * 30, 0, 30, 30));
+            ghostSprite.setTextureRect(IntRect(frameIndex * 32, 0, 32, 30));
             ghostSprite.move(speed, 0);
         }
         else if (status == 1 && (g.pacmanMatrix[ghostI][ghostJ - 1] != 0 || (ghostSprite.getPosition().x != Graph::nodesInfo[ghostI * Graph::COLS + ghostJ].XstartPoint && ghostSprite.getPosition().y == Graph::nodesInfo[ghostI * Graph::COLS + ghostJ].YstartPoint && g.pacmanMatrix[ghostI][ghostJ - 1] == 0))) {  // Left
             frame++;
             int frameIndex = frame % 2;
-            ghostSprite.setTextureRect(IntRect((frameIndex + 6) * 30, 0, 30, 30));
+            ghostSprite.setTextureRect(IntRect((frameIndex + 2) * 32, 0, 32, 30));
             ghostSprite.move(-speed, 0);
         }
         else if (status == 2 && (g.pacmanMatrix[ghostI - 1][ghostJ] != 0 || (ghostSprite.getPosition().x == Graph::nodesInfo[ghostI * Graph::COLS + ghostJ].XstartPoint && ghostSprite.getPosition().y != Graph::nodesInfo[ghostI * Graph::COLS + ghostJ].YstartPoint && g.pacmanMatrix[ghostI - 1][ghostJ] == 0))) {  // Up
             frame++;
             int frameIndex = frame % 2;
-            ghostSprite.setTextureRect(IntRect((frameIndex + 4) * 30, 0, 30, 30));
+            ghostSprite.setTextureRect(IntRect((frameIndex + 4) * 32, 0, 32, 30));
             ghostSprite.move(0, -speed);
         }
         else if (status == 3 && (g.pacmanMatrix[ghostI + 1][ghostJ] != 0 || (ghostSprite.getPosition().x == Graph::nodesInfo[ghostI * Graph::COLS + ghostJ].XstartPoint && ghostSprite.getPosition().y != Graph::nodesInfo[ghostI * Graph::COLS + ghostJ].YstartPoint && g.pacmanMatrix[ghostI + 1][ghostJ] == 0))) {  // Down
             frame++;
             int frameIndex = frame % 2;
-            ghostSprite.setTextureRect(IntRect((frameIndex + 2) * 30, 0, 30, 30));
+            ghostSprite.setTextureRect(IntRect((frameIndex + 6) * 32, 0, 32, 30));
             ghostSprite.move(0, speed);
         }
         else {
@@ -223,20 +237,6 @@ bool ghost::checkCollision(pacman& player) {
         return true;
     }
 
-
-
-}
-
-int ghost::countRemainingFood(const std::vector<std::unique_ptr<Food>>& foodList) {
-    int count = 0;
-    for (const auto& food : foodList) {
-        if (!food->eaten()) count++;
-    }
-    return count;
-}
-
-bool ghost::isStuck() const {
-    return stationaryCounter > 100;
 }
 
 void ghost::draw(RenderWindow& window) {
