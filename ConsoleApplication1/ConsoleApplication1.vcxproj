@@ -132,6 +132,9 @@
       <AdditionalLibraryDirectories>SFML-2.6.1\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>sfml-graphics.lib;sfml-window.lib;sfml-system.lib;sfml-audio.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Xdcmake>
+      <OutputFile>$PacMan.xml</OutputFile>
+    </Xdcmake>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ghost.cpp" />
@@ -143,6 +146,7 @@
     <ClCompile Include="SoundManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FileHandler.h" />
     <ClInclude Include="ghost.h" />
     <ClInclude Include="Graph.h" />
     <ClInclude Include="Map_Level.h" />

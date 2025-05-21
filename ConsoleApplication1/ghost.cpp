@@ -89,7 +89,25 @@ bool ghost::checkCollision(pacman& player) {
     FloatRect pacmanBounds = player.pacsprite.getGlobalBounds();
 
     // very basic logic i'll edit it soon
-    return ghostBounds.intersects(pacmanBounds);
+    if (ghostBounds.intersects(pacmanBounds)) {
+        //   player.isDying = true;
+        return true;
+    }
+
+
+
+}
+
+int ghost::countRemainingFood(const std::vector<std::unique_ptr<Food>>& foodList) {
+    int count = 0;
+    for (const auto& food : foodList) {
+        if (!food->eaten()) count++;
+    }
+    return count;
+}
+
+bool ghost::isStuck() const {
+    return stationaryCounter > 100;
 }
 
 void ghost::draw(RenderWindow& window) {

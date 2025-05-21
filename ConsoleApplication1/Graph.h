@@ -35,7 +35,10 @@ public:
 
 	static unordered_map<int, vector<int>> constructGraph(std::vector<std::vector<int>>& pacmanMatrix, int nodeSize = NODESIZE);
 
-	static vector<int> bfs(int start, int target);
+	static vector<int> bfs(int start, int target,int id);
+	vector<int>a_star(int start, int target);
+	float heuristic(int a, int b);
+	vector<vector<float>> edgeWeights;
 
 	static vector<int> ReconstructPath(std::vector<int>& parent, int start, int target);
 
