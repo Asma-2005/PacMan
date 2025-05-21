@@ -49,7 +49,6 @@ public:
 
 
 
-	static vector<int> bfs(int start, int target);
 
 	static vector<int> ReconstructPath(vector<int>& parent, int start, int target);
 

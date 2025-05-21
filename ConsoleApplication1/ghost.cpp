@@ -237,8 +237,6 @@ bool ghost::checkCollision(pacman& player) {
         return true;
     }
 
-    // very basic logic i'll edit it soon
-    return ghostBounds.intersects(pacmanBounds);
 }
 
 void ghost::draw(RenderWindow& window) {
