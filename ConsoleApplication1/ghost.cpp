@@ -16,6 +16,8 @@ ghost::ghost(int x,int y,int i) {
     status = -1;
     moveCounter = 0;
     vulnerable = false;
+    lastVisitedNode = -1;
+    stationaryCounter = 0;
     id = i;
 }
 
@@ -44,6 +46,15 @@ void ghost::movement(pacman& player, Graph& g, int level) {
 
     int ghostNodeId = ghostI * Graph::COLS + ghostJ;
     int pacmanNodeId = pacmanI * Graph::COLS + pacmanJ;
+
+    //this is to detect ghost stuck in a node
+    if (ghostNodeId == lastVisitedNode) { 
+        stationaryCounter++; 
+    }
+    else {
+        stationaryCounter = 0; 
+        lastVisitedNode = ghostNodeId; 
+    }
     if (checkCollision(player)) {
         if (vulnerable) {
             isDying = 1;
@@ -137,6 +148,7 @@ void ghost::movement(pacman& player, Graph& g, int level) {
                 path=g.dijkstra()*/
 
         }
+        
         moveCounter = 0;
     }
 
@@ -211,6 +223,20 @@ bool ghost::checkCollision(pacman& player) {
         return true;
     }
 
+
+
+}
+
+int ghost::countRemainingFood(const std::vector<std::unique_ptr<Food>>& foodList) {
+    int count = 0;
+    for (const auto& food : foodList) {
+        if (!food->eaten()) count++;
+    }
+    return count;
+}
+
+bool ghost::isStuck() const {
+    return stationaryCounter > 100;
 }
 
 void ghost::draw(RenderWindow& window) {

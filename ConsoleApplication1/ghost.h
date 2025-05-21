@@ -37,6 +37,12 @@ public:
     float vulnerableDuration = 6.0f;
     Clock vulnerableClock;
 
+
+protected:
+    int countRemainingFood(const vector<unique_ptr<Food>>& foodList);
+    bool isStuck() const;
+    int lastVisitedNode;
+    int stationaryCounter;
 };
 
   

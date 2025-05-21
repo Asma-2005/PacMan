@@ -626,7 +626,7 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
     t.setString(name);
 
     auto& foodList = tileRenderer.getfoodList();
-
+    g.updateWeights(foodList);
 
     // Game loop
     while (window.isOpen()) {
