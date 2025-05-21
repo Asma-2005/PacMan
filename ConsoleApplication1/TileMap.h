@@ -25,7 +25,7 @@ public:
             for (unsigned int j = 0; j < height; ++j)
             {
 
-                int tileNumber = tiles[ i + j * width];
+                int tileNumber = Graph::pacmanMatrix[j][i];
 
                 int tu = tileNumber % (map_tileset.getSize().x / tileSize.x);
                 int tv = tileNumber / (map_tileset.getSize().x / tileSize.x);

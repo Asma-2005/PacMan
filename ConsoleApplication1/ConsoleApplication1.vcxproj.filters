@@ -24,13 +24,13 @@
     <ClCompile Include="Menu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SoundManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="pacman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Map_Level.cpp">
+    <ClCompile Include="ghost.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TileRenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -47,10 +47,16 @@
     <ClInclude Include="pacman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TileMap.h">
+    <ClInclude Include="ghost.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Map_Level.h">
+    <ClInclude Include="TileRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Score.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FileHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

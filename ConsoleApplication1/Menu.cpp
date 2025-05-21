@@ -36,6 +36,13 @@ Menu::Menu(float width, float height)
 	mainmenu[3].setPosition(Vector2f(width / 4, height / (2) + 330));
 
 	selected = 0;
+	selected1 = 0;
+
+	DrowScore.loadFromFile("Assets/images/score.png");
+	
+	drowscore.setPosition(1700, 100);
+	drowscore.setTexture(DrowScore);
+	drowscore.setScale(0.1, 0.1);
 
 }
 
@@ -52,9 +59,11 @@ void Menu::draw(RenderWindow& window) {
 	{
 		window.draw(mainmenu[i]);
 	}
+	window.draw(drowscore);
 }
 
 void Menu::MoveDown() {
+	selected = selected1;
 	if (selected + 1 <= 4) //not exit
 	{
 		mainmenu[selected].setFillColor(Color::White);
@@ -65,10 +74,13 @@ void Menu::MoveDown() {
 		}
 		mainmenu[selected].setFillColor(Color::Green);
 	}
+	selected1 = selected;
+
 }
 
 void Menu::MoveUp()
 {
+	selected = selected1;
 	if (selected - 1 >= -1)  //not play
 	{
 		mainmenu[selected].setFillColor(Color::White);
@@ -79,20 +91,34 @@ void Menu::MoveUp()
 		}
 		mainmenu[selected].setFillColor(Color::Green);
 	}
+	selected1 = selected;
 
 }
 
 void Menu::checkMouseHover(RenderWindow& window)     //Move the mouse to change the color.
 {
+	
 	for (int i = 0; i < 4; i++)
 	{
+		selected = selected1;
 		if (mainmenu[i].getGlobalBounds().contains(window.mapPixelToCoords(Mouse::getPosition(window))))
 		{
 			mainmenu[selected].setFillColor(Color::White);  // Before the mouse moves
 			selected = i;                                                              // Convert to new
 			mainmenu[selected].setFillColor(Color::Green);  //After the mouse moves
 		}
+		selected1 = selected;
 	}
+	if (drowscore.getGlobalBounds().contains(window.mapPixelToCoords(Mouse::getPosition(window))))
+	{
+		drowscore.setScale(0.15f, 0.15f);
+		selected = 4;
+	}
+	else
+	{
+		drowscore.setScale(0.1f, 0.1f); 
+	}
+		
 }
 int Menu::getHoveredIndex(RenderWindow& window)
 {
@@ -102,6 +128,10 @@ int Menu::getHoveredIndex(RenderWindow& window)
 		{
 			return i;
 		}
+	}
+	if (drowscore.getGlobalBounds().contains(window.mapPixelToCoords(Mouse::getPosition(window))))
+	{
+		return 4;
 	}
 	return -1;
 }
