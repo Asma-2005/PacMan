@@ -591,10 +591,11 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
     Graph g;
     pacman player(19, 20);
     TileRenderer tileRenderer(48, level);
-    ghost myghost(18,11);
-    ghost myghost1(17, 11);
-    ghost myghost2(21, 11);
-    ghost myghost3(22, 11);
+    //here we are setting the ghost to its home
+    ghost myghost(18,11,0);
+    ghost myghost1(17, 11,1);
+    ghost myghost2(21, 11,2);
+    ghost myghost3(22, 11,3);
 
 
     Clock clock;
@@ -635,10 +636,12 @@ int Game_Play(RenderWindow& window, int level,string& name, SoundManager& soundM
             if (Keyboard::isKeyPressed(Keyboard::Escape)) return 1000;
         }
         player.movement();
-        myghost.movement(player, g);
-        if (numghost >= 2)myghost1.movement(player, g);
-        if (numghost >= 3)myghost2.movement(player, g);
-        if (numghost >= 4)myghost3.movement(player, g);
+        myghost.movement(player, g,level);
+
+        
+        if (numghost >= 2)myghost1.movement(player, g,level); 
+        if (numghost >= 3)myghost2.movement(player, g,level);  
+        if (numghost >= 4)myghost3.movement(player, g,level);
 
         for (auto it = foodList.begin(); it != foodList.end(); ) {
             if (player.pacsprite.getGlobalBounds().intersects((*it)->getBounds())) {

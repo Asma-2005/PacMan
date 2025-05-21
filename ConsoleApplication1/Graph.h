@@ -10,6 +10,7 @@
 #include <algorithm>
 #include <unordered_map>
 #include <iostream>
+#include"Food.h"
 #pragma once
 using namespace std;
 
@@ -33,10 +34,18 @@ public:
 
 	static Node ConstructNode(int i, int j, int nodeSize);
 
-	static unordered_map<int, vector<int>> constructGraph(std::vector<std::vector<int>>& pacmanMatrix, int nodeSize = NODESIZE);
+	static unordered_map<int, vector<int>> constructGraph(vector<vector<int>>& pacmanMatrix, int nodeSize = NODESIZE);
 
-	static vector<int> bfs(int start, int target);
+	static vector<int> bfs(int start, int target,int id);
+	vector<int>a_star(int start, int target);
+	float heuristic(int a, int b);
+	vector<vector<float>> edgeWeights;
 
-	static vector<int> ReconstructPath(std::vector<int>& parent, int start, int target);
+
+
+	void updateWeights(const vector<unique_ptr<Food>>& foodList); //when food is eaten we update the weights of the node back to normal
+	
+	vector<int> dijkstra(int start, int target);
+	static vector<int> ReconstructPath(vector<int>& parent, int start, int target);
 
 };

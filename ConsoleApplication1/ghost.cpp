@@ -4,7 +4,7 @@
 bool ghost::isVulnerable() {
     return vulnerable;
 }
-ghost::ghost(int x,int y) {
+ghost::ghost(int x,int y,int i) {
     ghostWeakShape.loadFromFile("Assets/images/GhostBody32.png");
     ghostTex.loadFromFile("Assets/images/enemy_spritethis.png");
     ghostSprite.setTexture(ghostTex);
@@ -16,7 +16,7 @@ ghost::ghost(int x,int y) {
     status = -1;
     moveCounter = 0;
     vulnerable = false;
-
+    id = i;
 }
 
 void ghost::setVulnerable() {
@@ -25,7 +25,14 @@ void ghost::setVulnerable() {
     ghostSprite.setTexture(ghostWeakShape);
     ghostSprite.setTextureRect(IntRect(0, 0, 30, 30));
 }
-void ghost::movement(pacman& player, Graph& g) {
+
+/*
+adding prameter to movement int level
+0: call the bfs each 20 frame bfs
+1 : call a * each 20 frame a*
+2 : the hardest level will make its algorithm later
+*/
+void ghost::movement(pacman& player, Graph& g, int level) {
     Vector2f ghostPos = ghostSprite.getPosition();
     Vector2f pacmanPos = player.pacsprite.getPosition();
 
@@ -40,7 +47,10 @@ void ghost::movement(pacman& player, Graph& g) {
     if (checkCollision(player)) {
         if (vulnerable) {
             isDying = 1;
-            path = g.bfs(ghostNodeId, homeId);
+            
+            path = g.bfs(ghostNodeId, homeId,0);
+            
+          
             moveCounter = 20;  // Force path recalculation immediately
             std::cout << "Ghost is dying. Current node: " << ghostNodeId << ", Target node: " << homeId << std::endl;
 
@@ -111,7 +121,22 @@ void ghost::movement(pacman& player, Graph& g) {
         else {
             targetNodelId = pacmanNodeId;
         }
-        path = g.bfs(ghostNodeId, targetNodelId);
+        
+        if(level==0){ 
+        path = g.bfs(ghostNodeId, targetNodelId,ghost::id);
+        }
+        else if(level==1)
+            path = g.a_star(ghostNodeId, targetNodelId);
+
+        else if (level == 2) {
+            if (ghost::id == 0)
+                path = g.bfs(ghostNodeId, targetNodelId, ghost::id);
+            else if (ghost::id == 1)
+                path = g.a_star(ghostNodeId, targetNodelId);
+          /*  else if(ghost::id==3)
+                path=g.dijkstra()*/
+
+        }
         moveCounter = 0;
     }
 

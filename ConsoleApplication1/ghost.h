@@ -8,9 +8,10 @@ using namespace sf;
 class ghost
 {
 public:
-    ghost(int x,int y);
+    ghost(int x,int y,int id);
+    int id;
     void setVulnerable();
-    void movement(pacman& pac, Graph& g);
+    void movement(pacman& pac, Graph& g,int level);
     void draw(RenderWindow& window);
     bool checkCollision(pacman& pac);
     bool isVulnerable();
@@ -24,14 +25,13 @@ public:
     int homeId = 18 * Graph::COLS + 11;
     Clock freezeClock;
     bool freezeStarts = 0;
-
-public:
     int status;
     Texture ghostWeakShape;
     Texture ghostTex;
     int frame;
     float speed;
     Graph g;
+   
 
     bool vulnerable;
     float vulnerableDuration = 6.0f;
