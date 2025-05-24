@@ -2,7 +2,7 @@
 
 A modern C++ implementation of the classic Pac-Man game featuring intelligent ghost AI using different pathfinding algorithms. Built with SFML (Simple and Fast Multimedia Library) and advanced graph algorithms.
 
-![Game Screenshot](PacMan/Screenshot 2025-05-24 084153.png)
+![Game Screenshot](Screenshot 2025-05-24 084153.png)
 
 
 ## 🎮 Features
