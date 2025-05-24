@@ -212,7 +212,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## Project decumentation
 
-Project Video: [https://github.com/yourusername/pacman-ai-game](https://github.com/yourusername/pacman-ai-game)
+Project Video: [https://youtu.be/0M5LkG5rUYM)]
 
 ---
 
