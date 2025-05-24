@@ -210,11 +210,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - Graph algorithm implementations adapted from computer science literature
 - Sprite assets created by [Artist Name] (replace with actual attribution)
 
-## 📞 Contact
+## Project decumentation
 
-Your Name - [@yourtwitter](https://twitter.com/yourtwitter) - email@example.com
-
-Project Link: [https://github.com/yourusername/pacman-ai-game](https://github.com/yourusername/pacman-ai-game)
+Project Video: [https://github.com/yourusername/pacman-ai-game](https://github.com/yourusername/pacman-ai-game)
 
 ---
 
