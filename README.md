@@ -23,7 +23,7 @@ Project Video: [https://youtu.be/0M5LkG5rUYM)]
 
 ### Advanced Ghost AI
 - **BFS Ghost**: Uses Breadth-First Search for direct pursuit with random movement elements
-- **DFS Ghost**: Uses Depth-First Search for unpredictable patrolling behavior between food items
+- **A Ghost (A-Star Search)** : Intelligent pursuit of Pac-Man using heuristic-guided pathfinding
 - **Dijkstra Ghost**: Uses Dijkstra's algorithm with weighted edges based on food positions for optimal pathfinding
 
 ### Technical Features
