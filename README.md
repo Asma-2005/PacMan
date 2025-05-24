@@ -2,6 +2,10 @@
 
 A modern C++ implementation of the classic Pac-Man game featuring intelligent ghost AI using different pathfinding algorithms. Built with SFML (Simple and Fast Multimedia Library) and advanced graph algorithms.
 
+
+## Project Decumentation
+
+Project Video: [https://youtu.be/0M5LkG5rUYM)]
 ![Game Screenshot](ConsoleApplication1/Assets/screen1)
 ![Game Screenshot](ConsoleApplication1/Assets/screen2)
 ![Game Screenshot](ConsoleApplication1/Assets/screen3)
@@ -181,12 +185,6 @@ protected:
 - **Path recalculation frequency**: Modify `moveCounter` threshold in `movement()` 
 - **Anti-camping sensitivity**: Change `stationaryCounter` threshold in `isStuck()`
 
-## 🐛 Known Issues
-
-- Ghost sprites may occasionally flicker during rapid direction changes
-- Performance may decrease with very large maze sizes
-- Food collision detection requires fine-tuning for pixel-perfect accuracy
-
 ## 🤝 Contributing
 
 Contributions are welcome! Here are some ways you can help:
@@ -197,28 +195,11 @@ Contributions are welcome! Here are some ways you can help:
 4. **Push** to the branch (`git push origin feature/AmazingFeature`)
 5. **Open** a Pull Request
 
-### Ideas for Contributions
-- Add A* pathfinding algorithm
-- Implement power pellets that make ghosts vulnerable
-- Add sound effects and background music
-- Create level progression system
-- Implement high score tracking
-- Add multiplayer support
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## 🙏 Acknowledgments
 
 - Classic Pac-Man game by Namco for inspiration
 - SFML community for excellent documentation
 - Graph algorithm implementations adapted from computer science literature
-- Sprite assets created by [Artist Name] (replace with actual attribution)
-
-## Project decumentation
-
-Project Video: [https://youtu.be/0M5LkG5rUYM)]
 
 ---
 
