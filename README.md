@@ -147,7 +147,7 @@ pacman-ai-game/
   - Guaranteed shortest path when chasing
   - More aggressive when few food items remain
 
-###A Ghost (A-Star Search)*
+### A Ghost (A-Star Search)*
 
 - **Behavior**: Intelligent pursuit of Pac-Man using heuristic-guided pathfinding
 - **Features**:
