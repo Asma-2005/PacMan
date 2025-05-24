@@ -147,12 +147,15 @@ pacman-ai-game/
   - Guaranteed shortest path when chasing
   - More aggressive when few food items remain
 
-### DFS Ghost (Depth-First Search)  
-- **Behavior**: Patrols between food items
+###A Ghost (A-Star Search)*
+
+- **Behavior**: Intelligent pursuit of Pac-Man using heuristic-guided pathfinding
 - **Features**:
-  - Targets food items systematically
-  - Creates unpredictable movement patterns
-  - Switches to direct chase when food is scarce
+   - 20% chance of random movement for unpredictability
+   - Guaranteed optimal path with improved efficiency over BFS
+   - Uses Manhattan distance heuristic to prioritize promising directions
+   - More aggressive when few food items remain
+   - Faster pathfinding compared to pure BFS while maintaining shortest path guarantee
 
 ### Dijkstra Ghost (Dijkstra's Algorithm)
 - **Behavior**: Optimal pathfinding with weighted edges
